@@ -1,3 +1,5 @@
+Copy and paste this whole code into GitHub as index.html.
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -137,8 +139,8 @@ body {
 .card {
   background:var(--card-bg);
   border:1.5px solid var(--card-border);
-  border-radius:14px;
-  padding:14px;
+  border-radius:18px;
+  padding:16px;
   margin-bottom:14px;
 }
 .section-label,
@@ -149,43 +151,99 @@ body {
   text-transform:uppercase;
   letter-spacing:1.5px;
   font-weight:700;
-  margin-bottom:10px;
+  margin-bottom:12px;
+  text-align:center;
+}
+.team-badge {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  max-width:520px;
+  margin:0 auto 16px;
+  padding:12px;
+  border-radius:14px;
+  border:1.5px solid var(--card-border);
+  background:rgba(0,0,0,.25);
+}
+.badge-circle {
+  width:52px;
+  height:52px;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+  font-size:1rem;
+  background:var(--gold);
+  color:#1a1208;
+}
+.team-badge.school .badge-circle {
+  background:var(--blue);
+  color:white;
+}
+.team-label {
+  color:var(--offwhite);
+  opacity:.7;
+  font-size:.7rem;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+#teamName {
+  font-size:1.15rem;
+  font-weight:900;
 }
 .field-grid {
   display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
+  grid-template-columns:1fr;
+  gap:14px;
+  max-width:520px;
+  margin:0 auto;
 }
 .full {
-  grid-column:1/-1;
+  grid-column:1;
 }
 label {
   display:block;
   color:var(--offwhite);
   opacity:.7;
   font-size:.75rem;
-  margin-bottom:4px;
+  margin-bottom:6px;
   text-transform:uppercase;
+  text-align:center;
+  letter-spacing:1px;
 }
 input,
 select {
   width:100%;
   background:rgba(0,0,0,.35);
   border:1.5px solid var(--card-border);
-  border-radius:8px;
+  border-radius:14px;
   color:var(--white);
-  padding:10px;
-  font-size:1rem;
+  padding:14px;
+  font-size:1.1rem;
+  text-align:center;
+}
+input[type="date"],
+input[type="text"] {
+  min-height:58px;
 }
 .score-row {
   display:flex;
+  justify-content:center;
   align-items:center;
-  gap:8px;
+  gap:12px;
+  flex-wrap:wrap;
 }
 .score-row input {
-  max-width:76px;
+  width:88px;
+  height:66px;
   text-align:center;
-  font-size:1.3rem;
+  font-size:1.8rem;
+  font-weight:900;
+}
+.score-label {
+  font-size:1rem;
   font-weight:800;
 }
 .stat-grid {
@@ -498,8 +556,8 @@ select {
       <div class="subtitle">Performance Tracker</div>
     </div>
     <div class="mode-toggle">
-      <button class="mode-btn active-club" data-mode="club">⚡ Club</button>
-      <button class="mode-btn" data-mode="school">🎒 School</button>
+      <button class="mode-btn active-club" data-mode="club">⚡ Anselmians</button>
+      <button class="mode-btn" data-mode="school">🎒 Wirral Grammar</button>
     </div>
   </div>
   <nav class="nav-tabs">
@@ -509,9 +567,16 @@ select {
   </nav>
 </header>
 <main class="page active" id="page-record">
-  <div id="modeBanner" class="mode-banner club">⚡ CLUB RUGBY — Recording Stats</div>
+  <div id="modeBanner" class="mode-banner club">⚡ CLUB RUGBY — Anselmians</div>
   <section class="card">
     <div class="section-label">📅 Match Details</div>
+    <div id="teamBadge" class="team-badge club">
+      <div class="badge-circle" id="badgeInitials">OA</div>
+      <div>
+        <div class="team-label">Us</div>
+        <div id="teamName">Anselmians</div>
+      </div>
+    </div>
     <div class="field-grid">
       <div>
         <label>Date</label>
@@ -524,11 +589,11 @@ select {
       <div class="full">
         <label>Final Score</label>
         <div class="score-row">
-          <span>Us</span>
+          <span class="score-label" id="scoreUsLabel">Anselmians</span>
           <input type="number" id="scoreUs" value="0" min="0">
           <span>–</span>
           <input type="number" id="scoreThem" value="0" min="0">
-          <span>Them</span>
+          <span class="score-label">Them</span>
         </div>
       </div>
     </div>
@@ -666,6 +731,12 @@ document.addEventListener('DOMContentLoaded', function () {
   function byId(id) {
     return document.getElementById(id);
   }
+  function getTeamName(mode) {
+    return mode === 'school' ? 'Wirral Grammar Boys' : 'Anselmians';
+  }
+  function getShortTeamName(mode) {
+    return mode === 'school' ? 'Wirral Grammar' : 'Anselmians';
+  }
   function getMatches() {
     try {
       return JSON.parse(localStorage.getItem('joesRugbyMatches') || '[]');
@@ -701,8 +772,25 @@ document.addEventListener('DOMContentLoaded', function () {
       btn.className = 'mode-btn' + (btn.dataset.mode === mode ? ' active-' + mode : '');
     });
     const banner = byId('modeBanner');
-    banner.className = 'mode-banner ' + mode;
-    banner.textContent = (mode === 'club' ? '⚡ CLUB RUGBY' : '🎒 SCHOOL RUGBY') + ' — Recording Stats';
+    const teamBadge = byId('teamBadge');
+    const teamName = byId('teamName');
+    const scoreUsLabel = byId('scoreUsLabel');
+    const badgeInitials = byId('badgeInitials');
+    if (mode === 'club') {
+      banner.className = 'mode-banner club';
+      banner.textContent = '⚡ CLUB RUGBY — Anselmians';
+      teamBadge.className = 'team-badge club';
+      teamName.textContent = 'Anselmians';
+      scoreUsLabel.textContent = 'Anselmians';
+      badgeInitials.textContent = 'OA';
+    } else {
+      banner.className = 'mode-banner school';
+      banner.textContent = '🎒 SCHOOL RUGBY — Wirral Grammar Boys';
+      teamBadge.className = 'team-badge school';
+      teamName.textContent = 'Wirral Grammar Boys';
+      scoreUsLabel.textContent = 'Wirral Grammar';
+      badgeInitials.textContent = 'WGS';
+    }
   }
   function showPage(page) {
     document.querySelectorAll('.page').forEach(function (p) {
@@ -755,6 +843,7 @@ document.addEventListener('DOMContentLoaded', function () {
       date: date,
       opposition: opposition,
       mode: currentMode,
+      team: getTeamName(currentMode),
       scoreUs: parseInt(byId('scoreUs').value, 10) || 0,
       scoreThem: parseInt(byId('scoreThem').value, 10) || 0,
       stats: Object.assign({}, counts)
@@ -817,7 +906,7 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       const color = match.mode === 'club' ? '#f5c518' : '#3a8fd4';
       return '<div class="bar-row">' +
-        '<div class="bar-label"><span>' + date + ' vs ' + escapeHtml(match.opposition) + '</span><strong>' + value + '</strong></div>' +
+        '<div class="bar-label"><span>' + date + ' · ' + escapeHtml(match.team || getTeamName(match.mode)) + ' vs ' + escapeHtml(match.opposition) + '</span><strong>' + value + '</strong></div>' +
         '<div class="bar-track"><div class="bar-fill" style="width:' + width + '%; background:' + color + ';"></div></div>' +
         '</div>';
     }).join('');
@@ -844,10 +933,11 @@ document.addEventListener('DOMContentLoaded', function () {
         year:'numeric'
       });
       const mode = match.mode || 'club';
+      const team = match.team || getTeamName(mode);
       return '<div class="match-card">' +
         '<div class="match-head" data-open-match="' + match.id + '">' +
           '<div>' +
-            '<span class="badge ' + mode + '">' + mode + '</span>' +
+            '<span class="badge ' + mode + '">' + escapeHtml(team) + '</span>' +
             '<div class="opp">vs ' + escapeHtml(match.opposition) + '</div>' +
             '<div class="date">' + date + '</div>' +
           '</div>' +
