@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rugby Match Stats Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 16px;
+      color: #222;
+    }
+
+    h1, h2 {
+      margin-bottom: 10px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .stat-btn {
+      background: #1f7ae0;
+      color: white;
+    }
+
+    .negative {
+      background: #d9534f;
+    }
+
+    .save {
+      background: #198754;
+      color: white;
+      width: 100%;
+      margin-top: 14px;
+    }
+
+    .secondary {
+      background: #444;
+      color: white;
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .danger {
+      background: #b00020;
+      color: white;
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .counter {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    .history-item {
+      border-bottom: 1px solid #ddd;
+      padding: 10px 0;
+    }
+
+    .small {
+      font-size: 13px;
+      color: #555;
+    }
+
+    canvas {
+      max-height: 340px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Rugby Stats Tracker</h1>
+
+  <div class="card">
+    <h2>Match Details</h2>
+
+    <label>Match Type</label>
+    <select id="matchType">
+      <option value="Club">Club Rugby</option>
+      <option value="School">School Rugby</option>
+    </select>
+
+    <label>Opposition</label>
+    <input id="opposition" placeholder="e.g. Wirral RFC" />
+
+    <label>Match Date</label>
+    <input id="matchDate" type="date" />
+
+    <label>Match Score</label>
+    <input id="score" placeholder="e.g. Won 24-12" />
+  </div>
+
+  <div class="card">
+    <h2>Live Match Stats</h2>
+
+    <div class="stats-grid" id="statsButtons"></div>
+
+    <button class="save" onclick="saveMatch()">Save Match</button>
+    <button class="secondary" onclick="resetCurrentStats()">Reset Current Match Stats</button>
+  </div>
+
+  <div class="card">
+    <h2>Dashboard</h2>
+
+    <label>View</label>
+    <select id="dashboardFilter" onchange="updateDashboard()">
+      <option value="Both">Club + School</option>
+      <option value="Club">Club Rugby</option>
+      <option value="School">School Rugby</option>
+    </select>
+
+    <label>Graph Stat</label>
+    <select id="statSelector" onchange="updateDashboard()"></select>
+
+    <canvas id="statsChart"></canvas>
+  </div>
+
+  <div class="card">
+    <h2>Match History</h2>
+    <div id="history"></div>
+
+    <button class="secondary" onclick="exportData()">Export Backup</button>
+    <input type="file" id="importFile" onchange="importData(event)" />
+    <button class="danger" onclick="clearAllData()">Clear All History</button>
+  </div>
+
+<script>
+  const statNames = [
+    "Tackle made",
+    "Missed tackle",
+    "Counter ruck won",
+    "Ruck won",
+    "First to breakdown",
+    "Try",
+    "Try set up",
+    "Completed pass",
+    "Missed pass"
+  ];
+
+  let currentStats = {};
+  let matchHistory = JSON.parse(localStorage.getItem("rugbyStatsHistory")) || [];
+  let chart;
+
+  statNames.forEach(stat => currentStats[stat] = 0);
+
+  document.getElementById("matchDate").valueAsDate = new Date();
+
+  function buildStatButtons() {
+    const container = document.getElementById("statsButtons");
+    container.innerHTML = "";
+
+    statNames.forEach(stat => {
+      const btn = document.createElement("button");
+      btn.className = stat.includes("Missed") ? "stat-btn negative" : "stat-btn";
+      btn.innerHTML = `${stat}<br><span class="counter" id="${stat}Count">0</span>`;
+      btn.onclick = () => {
+        currentStats[stat]++;
+        document.getElementById(`${stat}Count`).innerText = currentStats[stat];
+      };
+      container.appendChild(btn);
+    });
+  }
+
+  function buildStatSelector() {
+    const selector = document.getElementById("statSelector");
+    selector.innerHTML = "";
+
+    statNames.forEach(stat => {
+      const option = document.createElement("option");
+      option.value = stat;
+      option.textContent = stat;
+      selector.appendChild(option);
+    });
+  }
+
+  function saveMatch() {
+    const opposition = document.getElementById("opposition").value.trim();
+    const matchDate = document.getElementById("matchDate").value;
+    const score = document.getElementById("score").value.trim();
+    const matchType = document.getElementById("matchType").value;
+
+    if (!opposition || !matchDate || !score) {
+      alert("Please enter opposition, match date and score.");
+      return;
+    }
+
+    const match = {
+      id: Date.now(),
+      matchType,
+      opposition,
+      matchDate,
+      score,
+      stats: { ...currentStats }
+    };
+
+    matchHistory.push(match);
+    localStorage.setItem("rugbyStatsHistory", JSON.stringify(matchHistory));
+
+    resetCurrentStats();
+    document.getElementById("opposition").value = "";
+    document.getElementById("score").value = "";
+
+    updateDashboard();
+    renderHistory();
+
+    alert("Match saved.");
+  }
+
+  function resetCurrentStats() {
+    statNames.forEach(stat => {
+      currentStats[stat] = 0;
+      document.getElementById(`${stat}Count`).innerText = 0;
+    });
+  }
+
+  function getFilteredHistory() {
+    const filter = document.getElementById("dashboardFilter").value;
+
+    return matchHistory
+      .filter(match => filter === "Both" || match.matchType === filter)
+      .sort((a, b) => new Date(a.matchDate) - new Date(b.matchDate));
+  }
+
+  function updateDashboard() {
+    const selectedStat = document.getElementById("statSelector").value;
+    const filtered = getFilteredHistory();
+
+    const labels = filtered.map(match => `${match.matchDate} vs ${match.opposition}`);
+    const data = filtered.map(match => match.stats[selectedStat] || 0);
+
+    const ctx = document.getElementById("statsChart").getContext("2d");
+
+    if (chart) {
+      chart.destroy();
+    }
+
+    chart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels,
+        datasets: [{
+          label: selectedStat,
+          data,
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: true
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function renderHistory() {
+    const container = document.getElementById("history");
+    container.innerHTML = "";
+
+    if (matchHistory.length === 0) {
+      container.innerHTML = "<p>No matches saved yet.</p>";
+      return;
+    }
+
+    [...matchHistory]
+      .sort((a, b) => new Date(b.matchDate) - new Date(a.matchDate))
+      .forEach(match => {
+        const div = document.createElement("div");
+        div.className = "history-item";
+
+        div.innerHTML = `
+          <strong>${match.matchDate} - ${match.matchType}</strong><br>
+          <span>vs ${match.opposition}</span><br>
+          <span>Score: ${match.score}</span>
+          <p class="small">
+            Tackles: ${match.stats["Tackle made"] || 0} |
+            Missed tackles: ${match.stats["Missed tackle"] || 0} |
+            Tries: ${match.stats["Try"] || 0} |
+            Passes: ${match.stats["Completed pass"] || 0}
+          </p>
+          <button class="danger" onclick="deleteMatch(${match.id})">Delete Match</button>
+        `;
+
+        container.appendChild(div);
+      });
+  }
+
+  function deleteMatch(id) {
+    if (!confirm("Delete this match?")) return;
+
+    matchHistory = matchHistory.filter(match => match.id !== id);
+    localStorage.setItem("rugbyStatsHistory", JSON.stringify(matchHistory));
+
+    updateDashboard();
+    renderHistory();
+  }
+
+  function clearAllData() {
+    if (!confirm("This will delete all saved match history. Continue?")) return;
+
+    matchHistory = [];
+    localStorage.removeItem("rugbyStatsHistory");
+
+    updateDashboard();
+    renderHistory();
+  }
+
+  function exportData() {
+    const dataStr = JSON.stringify(matchHistory, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "rugby-stats-backup.json";
+    link.click();
+
+    URL.revokeObjectURL(url);
+  }
+
+  function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+      try {
+        const imported = JSON.parse(e.target.result);
+
+        if (!Array.isArray(imported)) {
+          alert("Invalid backup file.");
+          return;
+        }
+
+        matchHistory = imported;
+        localStorage.setItem("rugbyStatsHistory", JSON.stringify(matchHistory));
+
+        updateDashboard();
+        renderHistory();
+
+        alert("Backup imported.");
+      } catch {
+        alert("Could not import file.");
+      }
+    };
+
+    reader.readAsText(file);
+  }
+
+  buildStatButtons();
+  buildStatSelector();
+  updateDashboard();
+  renderHistory();
+</script>
+
+</body>
+</html>
