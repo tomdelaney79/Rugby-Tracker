@@ -1,55 +1,946 @@
-<div class="stat-grid">
-  <button class="stat-btn btn-tackle" onclick="increment('tackle',this)">
-    <span class="btn-label">Tackle Made</span>
-    <span class="btn-count" id="cnt-tackle">0</span>
-    <span class="minus-zone" onclick="decrement(event,'tackle')">−</span>
-  </button>
+You’re right — sorry. I gave you a downloadable file link again, not the actual code you can copy.
 
-  <button class="stat-btn btn-miss" onclick="increment('miss_tackle',this)">
-    <span class="btn-label">Missed Tackle</span>
-    <span class="btn-count" id="cnt-miss_tackle">0</span>
-    <span class="minus-zone" onclick="decrement(event,'miss_tackle')">−</span>
-  </button>
+Paste this entire block into GitHub as index.html:
 
-  <button class="stat-btn btn-counter" onclick="increment('counter_ruck',this)">
-    <span class="btn-label">Counter Ruck Won</span>
-    <span class="btn-count" id="cnt-counter_ruck">0</span>
-    <span class="minus-zone" onclick="decrement(event,'counter_ruck')">−</span>
-  </button>
-
-  <button class="stat-btn btn-ruck" onclick="increment('ruck_won',this)">
-    <span class="btn-label">Ruck Won</span>
-    <span class="btn-count" id="cnt-ruck_won">0</span>
-    <span class="minus-zone" onclick="decrement(event,'ruck_won')">−</span>
-  </button>
-
-  <button class="stat-btn btn-breakdown" onclick="increment('first_breakdown',this)">
-    <span class="btn-label">First to Breakdown</span>
-    <span class="btn-count" id="cnt-first_breakdown">0</span>
-    <span class="minus-zone" onclick="decrement(event,'first_breakdown')">−</span>
-  </button>
-
-  <button class="stat-btn btn-try" onclick="increment('try',this)">
-    <span class="btn-label">Try</span>
-    <span class="btn-count" id="cnt-try">0</span>
-    <span class="minus-zone" onclick="decrement(event,'try')">−</span>
-  </button>
-
-  <button class="stat-btn btn-trysetup" onclick="increment('try_setup',this)">
-    <span class="btn-label">Try Set Up</span>
-    <span class="btn-count" id="cnt-try_setup">0</span>
-    <span class="minus-zone" onclick="decrement(event,'try_setup')">−</span>
-  </button>
-
-  <button class="stat-btn btn-pass" onclick="increment('completed_pass',this)">
-    <span class="btn-label">Completed Pass</span>
-    <span class="btn-count" id="cnt-completed_pass">0</span>
-    <span class="minus-zone" onclick="decrement(event,'completed_pass')">−</span>
-  </button>
-
-  <button class="stat-btn btn-misspass wide" onclick="increment('missed_pass',this)">
-    <span class="btn-label">Missed Pass</span>
-    <span class="btn-count" id="cnt-missed_pass">0</span>
-    <span class="minus-zone" onclick="decrement(event,'missed_pass')">−</span>
-  </button>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Joe's Rugby Stats</title>
+<style>
+:root {
+  --mud:#1a1208;
+  --grass:#2d5a1b;
+  --grass2:#3a7a24;
+  --lime:#a8e063;
+  --gold:#f5c518;
+  --white:#f0ede6;
+  --offwhite:#c8c4b8;
+  --card-bg:#0f1a0a;
+  --card-border:#2a3d1a;
+  --card2:#162010;
+  --red:#e84040;
+  --blue:#3a8fd4;
+  --orange:#f07830;
+  --teal:#30c4b0;
+  --purple:#9060d0;
+}
+* {
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+body {
+  font-family: Arial, sans-serif;
+  background:var(--mud);
+  color:var(--white);
+  min-height:100vh;
+}
+.header {
+  background:linear-gradient(135deg,#0a1206,#162010,#0a1206);
+  border-bottom:4px solid var(--grass);
+  padding:10px 14px 0;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+.header-top {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:8px;
+}
+.ball-icon {
+  font-size:2rem;
+}
+.header-title {
+  flex:1;
+}
+.header-title h1 {
+  font-size:1.4rem;
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+.header-title span {
+  color:var(--lime);
+}
+.subtitle {
+  color:var(--offwhite);
+  font-size:.75rem;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+.mode-toggle {
+  display:flex;
+  border:2px solid var(--card-border);
+  border-radius:10px;
+  overflow:hidden;
+}
+.mode-btn {
+  border:0;
+  padding:8px 10px;
+  background:transparent;
+  color:var(--offwhite);
+  font-weight:700;
+  cursor:pointer;
+}
+.mode-btn.active-club {
+  background:var(--gold);
+  color:#1a1208;
+}
+.mode-btn.active-school {
+  background:var(--blue);
+  color:white;
+}
+.nav-tabs {
+  display:flex;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.nav-tab {
+  flex:1;
+  border:0;
+  background:transparent;
+  color:var(--offwhite);
+  padding:12px 4px;
+  font-weight:700;
+  cursor:pointer;
+  opacity:.65;
+}
+.nav-tab.active {
+  color:var(--lime);
+  opacity:1;
+  border-bottom:3px solid var(--lime);
+}
+.page {
+  display:none;
+  padding:14px;
+  max-width:720px;
+  margin:0 auto;
+}
+.page.active {
+  display:block;
+}
+.mode-banner {
+  padding:10px 12px;
+  border-radius:10px;
+  margin-bottom:12px;
+  font-weight:700;
+  letter-spacing:1px;
+}
+.mode-banner.club {
+  background:rgba(245,197,24,.12);
+  color:var(--gold);
+  border:1px solid rgba(245,197,24,.4);
+}
+.mode-banner.school {
+  background:rgba(58,143,212,.12);
+  color:var(--blue);
+  border:1px solid rgba(58,143,212,.4);
+}
+.card {
+  background:var(--card-bg);
+  border:1.5px solid var(--card-border);
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:14px;
+}
+.section-label,
+.stats-label {
+  color:var(--offwhite);
+  opacity:.75;
+  font-size:.78rem;
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+  font-weight:700;
+  margin-bottom:10px;
+}
+.field-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.full {
+  grid-column:1/-1;
+}
+label {
+  display:block;
+  color:var(--offwhite);
+  opacity:.7;
+  font-size:.75rem;
+  margin-bottom:4px;
+  text-transform:uppercase;
+}
+input,
+select {
+  width:100%;
+  background:rgba(0,0,0,.35);
+  border:1.5px solid var(--card-border);
+  border-radius:8px;
+  color:var(--white);
+  padding:10px;
+  font-size:1rem;
+}
+.score-row {
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.score-row input {
+  max-width:76px;
+  text-align:center;
+  font-size:1.3rem;
+  font-weight:800;
+}
+.stat-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:14px;
+}
+.stat-btn {
+  position:relative;
+  min-height:72px;
+  border:2px solid var(--card-border);
+  border-radius:12px;
+  background:var(--card2);
+  color:var(--white);
+  text-align:left;
+  padding:12px 42px 10px 14px;
+  cursor:pointer;
+  touch-action:manipulation;
+  user-select:none;
+  -webkit-tap-highlight-color:transparent;
+}
+.stat-btn.wide {
+  grid-column:1/-1;
+}
+.stat-btn:active {
+  transform:scale(.97);
+  background:rgba(255,255,255,.04);
+}
+.stat-btn:before {
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  bottom:0;
+  width:5px;
+  background:var(--c);
+  border-radius:12px 0 0 12px;
+}
+.stat-label {
+  display:block;
+  color:var(--offwhite);
+  opacity:.8;
+  font-weight:800;
+  font-size:.8rem;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+.stat-count {
+  display:block;
+  color:var(--c);
+  font-size:1.9rem;
+  font-weight:900;
+  margin-top:2px;
+}
+.minus-btn {
+  position:absolute;
+  right:8px;
+  top:8px;
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  border:0;
+  background:rgba(255,255,255,.08);
+  color:var(--offwhite);
+  font-size:1.2rem;
+  font-weight:900;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.minus-btn:active {
+  background:rgba(232,64,64,.25);
+  color:var(--red);
+}
+.pop {
+  animation:pop .2s ease-out;
+}
+@keyframes pop {
+  0% { transform:scale(1); }
+  50% { transform:scale(1.3); }
+  100% { transform:scale(1); }
+}
+.btn-tackle { --c:var(--blue); }
+.btn-miss { --c:var(--red); }
+.btn-counter { --c:var(--lime); }
+.btn-ruck { --c:var(--gold); }
+.btn-breakdown { --c:var(--purple); }
+.btn-try { --c:var(--lime); }
+.btn-trysetup { --c:var(--teal); }
+.btn-pass { --c:#70b8e8; }
+.btn-misspass { --c:var(--orange); }
+.save-btn,
+.reset-btn {
+  width:100%;
+  border:0;
+  border-radius:12px;
+  padding:15px;
+  margin-bottom:8px;
+  font-weight:900;
+  letter-spacing:1px;
+  cursor:pointer;
+}
+.save-btn {
+  background:linear-gradient(135deg,var(--grass),var(--grass2));
+  color:white;
+  font-size:1.05rem;
+}
+.reset-btn {
+  background:transparent;
+  color:var(--offwhite);
+  border:1.5px solid var(--card-border);
+}
+.filter-row {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:12px;
+}
+.filter-btn {
+  border:1.5px solid var(--card-border);
+  border-radius:999px;
+  background:transparent;
+  color:var(--offwhite);
+  padding:8px 12px;
+  font-weight:700;
+  cursor:pointer;
+}
+.filter-btn.active-all {
+  background:var(--lime);
+  color:#1a1208;
+}
+.filter-btn.active-club {
+  background:var(--gold);
+  color:#1a1208;
+}
+.filter-btn.active-school {
+  background:var(--blue);
+  color:white;
+}
+.totals {
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  margin-bottom:14px;
+  padding-bottom:4px;
+}
+.total-card {
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius:12px;
+  padding:10px;
+  min-width:92px;
+  text-align:center;
+}
+.total-val {
+  font-size:1.7rem;
+  font-weight:900;
+}
+.total-lbl {
+  color:var(--offwhite);
+  opacity:.7;
+  font-size:.65rem;
+  text-transform:uppercase;
+}
+.chart-card,
+.match-card {
+  background:var(--card-bg);
+  border:1.5px solid var(--card-border);
+  border-radius:14px;
+  padding:12px;
+  margin-bottom:10px;
+}
+.chart-title,
+.page-title {
+  font-size:1.1rem;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  font-weight:900;
+  margin-bottom:10px;
+}
+.bar-row {
+  margin:8px 0;
+}
+.bar-label {
+  display:flex;
+  justify-content:space-between;
+  font-size:.8rem;
+  color:var(--offwhite);
+  margin-bottom:4px;
+}
+.bar-track {
+  height:16px;
+  background:rgba(0,0,0,.35);
+  border-radius:8px;
+  overflow:hidden;
+}
+.bar-fill {
+  height:100%;
+  background:var(--lime);
+  width:0%;
+}
+.match-head {
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+  cursor:pointer;
+}
+.badge {
+  display:inline-block;
+  padding:3px 8px;
+  border-radius:6px;
+  font-size:.7rem;
+  font-weight:800;
+  text-transform:uppercase;
+  margin-bottom:4px;
+}
+.badge.club {
+  background:rgba(245,197,24,.2);
+  color:var(--gold);
+}
+.badge.school {
+  background:rgba(58,143,212,.2);
+  color:var(--blue);
+}
+.opp {
+  font-weight:900;
+}
+.date {
+  color:var(--offwhite);
+  opacity:.7;
+  font-size:.8rem;
+}
+.score {
+  font-weight:900;
+  white-space:nowrap;
+}
+.match-body {
+  display:none;
+  margin-top:12px;
+}
+.match-body.open {
+  display:block;
+}
+.match-stats {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+.small-stat {
+  background:rgba(0,0,0,.25);
+  border-radius:8px;
+  padding:8px;
+  text-align:center;
+}
+.small-val {
+  font-size:1.25rem;
+  font-weight:900;
+}
+.small-lbl {
+  font-size:.62rem;
+  color:var(--offwhite);
+  opacity:.7;
+  text-transform:uppercase;
+}
+.delete-btn {
+  margin-top:10px;
+  border:1px solid rgba(232,64,64,.4);
+  background:transparent;
+  color:var(--red);
+  border-radius:8px;
+  padding:8px 12px;
+}
+.empty {
+  text-align:center;
+  padding:40px 10px;
+  color:var(--offwhite);
+  opacity:.65;
+}
+.toast {
+  position:fixed;
+  left:50%;
+  bottom:20px;
+  transform:translateX(-50%) translateY(90px);
+  background:var(--grass2);
+  color:white;
+  padding:12px 22px;
+  border-radius:999px;
+  font-weight:900;
+  transition:.25s;
+  z-index:99;
+  white-space:nowrap;
+}
+.toast.show {
+  transform:translateX(-50%) translateY(0);
+}
+.toast.err {
+  background:var(--red);
+}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-top">
+    <div class="ball-icon">🏉</div>
+    <div class="header-title">
+      <h1>Joe's <span>Rugby</span></h1>
+      <div class="subtitle">Performance Tracker</div>
+    </div>
+    <div class="mode-toggle">
+      <button class="mode-btn active-club" data-mode="club">⚡ Club</button>
+      <button class="mode-btn" data-mode="school">🎒 School</button>
+    </div>
+  </div>
+  <nav class="nav-tabs">
+    <button class="nav-tab active" data-page="record">📋 Record</button>
+    <button class="nav-tab" data-page="dashboard">📊 Dashboard</button>
+    <button class="nav-tab" data-page="history">📁 History</button>
+  </nav>
+</header>
+<main class="page active" id="page-record">
+  <div id="modeBanner" class="mode-banner club">⚡ CLUB RUGBY — Recording Stats</div>
+  <section class="card">
+    <div class="section-label">📅 Match Details</div>
+    <div class="field-grid">
+      <div>
+        <label>Date</label>
+        <input type="date" id="matchDate">
+      </div>
+      <div>
+        <label>Opposition</label>
+        <input type="text" id="opposition" placeholder="e.g. Wirral RFC">
+      </div>
+      <div class="full">
+        <label>Final Score</label>
+        <div class="score-row">
+          <span>Us</span>
+          <input type="number" id="scoreUs" value="0" min="0">
+          <span>–</span>
+          <input type="number" id="scoreThem" value="0" min="0">
+          <span>Them</span>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="stats-label">🏉 Tap a stat to add · use − to correct</div>
+  <section class="stat-grid">
+    <div class="stat-btn btn-tackle" data-stat="tackle">
+      <span class="stat-label">Tackle Made</span>
+      <span class="stat-count" id="cnt-tackle">0</span>
+      <span class="minus-btn" data-minus="tackle">−</span>
+    </div>
+    <div class="stat-btn btn-miss" data-stat="miss_tackle">
+      <span class="stat-label">Missed Tackle</span>
+      <span class="stat-count" id="cnt-miss_tackle">0</span>
+      <span class="minus-btn" data-minus="miss_tackle">−</span>
+    </div>
+    <div class="stat-btn btn-counter" data-stat="counter_ruck">
+      <span class="stat-label">Counter Ruck Won</span>
+      <span class="stat-count" id="cnt-counter_ruck">0</span>
+      <span class="minus-btn" data-minus="counter_ruck">−</span>
+    </div>
+    <div class="stat-btn btn-ruck" data-stat="ruck_won">
+      <span class="stat-label">Ruck Won</span>
+      <span class="stat-count" id="cnt-ruck_won">0</span>
+      <span class="minus-btn" data-minus="ruck_won">−</span>
+    </div>
+    <div class="stat-btn btn-breakdown" data-stat="first_breakdown">
+      <span class="stat-label">First to Breakdown</span>
+      <span class="stat-count" id="cnt-first_breakdown">0</span>
+      <span class="minus-btn" data-minus="first_breakdown">−</span>
+    </div>
+    <div class="stat-btn btn-try" data-stat="try">
+      <span class="stat-label">Try</span>
+      <span class="stat-count" id="cnt-try">0</span>
+      <span class="minus-btn" data-minus="try">−</span>
+    </div>
+    <div class="stat-btn btn-trysetup" data-stat="try_setup">
+      <span class="stat-label">Try Set Up</span>
+      <span class="stat-count" id="cnt-try_setup">0</span>
+      <span class="minus-btn" data-minus="try_setup">−</span>
+    </div>
+    <div class="stat-btn btn-pass" data-stat="completed_pass">
+      <span class="stat-label">Completed Pass</span>
+      <span class="stat-count" id="cnt-completed_pass">0</span>
+      <span class="minus-btn" data-minus="completed_pass">−</span>
+    </div>
+    <div class="stat-btn btn-misspass wide" data-stat="missed_pass">
+      <span class="stat-label">Missed Pass</span>
+      <span class="stat-count" id="cnt-missed_pass">0</span>
+      <span class="minus-btn" data-minus="missed_pass">−</span>
+    </div>
+  </section>
+  <button class="save-btn" id="saveBtn">💾 SAVE MATCH</button>
+  <button class="reset-btn" id="resetBtn">↺ RESET / NEW MATCH</button>
+</main>
+<main class="page" id="page-dashboard">
+  <div class="page-title">Dashboard</div>
+  <div class="filter-row">
+    <button class="filter-btn active-all" data-dash-filter="all">All Matches</button>
+    <button class="filter-btn" data-dash-filter="club">⚡ Club</button>
+    <button class="filter-btn" data-dash-filter="school">🎒 School</button>
+  </div>
+  <div class="totals" id="totalsRow"></div>
+  <section class="card">
+    <label>Stat chart</label>
+    <select id="statPicker">
+      <option value="tackle">Tackles Made</option>
+      <option value="miss_tackle">Missed Tackles</option>
+      <option value="counter_ruck">Counter Rucks Won</option>
+      <option value="ruck_won">Rucks Won</option>
+      <option value="first_breakdown">First to Breakdown</option>
+      <option value="try">Tries</option>
+      <option value="try_setup">Try Set Ups</option>
+      <option value="completed_pass">Completed Passes</option>
+      <option value="missed_pass">Missed Passes</option>
+    </select>
+  </section>
+  <section class="chart-card">
+    <div class="chart-title" id="chartTitle">Match by Match</div>
+    <div id="barChart"></div>
+  </section>
+</main>
+<main class="page" id="page-history">
+  <div class="page-title">History <span id="matchCount"></span></div>
+  <div class="filter-row">
+    <button class="filter-btn active-all" data-hist-filter="all">All</button>
+    <button class="filter-btn" data-hist-filter="club">⚡ Club</button>
+    <button class="filter-btn" data-hist-filter="school">🎒 School</button>
+  </div>
+  <div id="matchList"></div>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const KEYS = [
+    'tackle',
+    'miss_tackle',
+    'counter_ruck',
+    'ruck_won',
+    'first_breakdown',
+    'try',
+    'try_setup',
+    'completed_pass',
+    'missed_pass'
+  ];
+  const LABELS = {
+    tackle:'Tackles Made',
+    miss_tackle:'Missed Tackles',
+    counter_ruck:'Counter Rucks Won',
+    ruck_won:'Rucks Won',
+    first_breakdown:'First to Breakdown',
+    try:'Tries',
+    try_setup:'Try Set Ups',
+    completed_pass:'Completed Passes',
+    missed_pass:'Missed Passes'
+  };
+  const COLORS = {
+    tackle:'#3a8fd4',
+    miss_tackle:'#e84040',
+    counter_ruck:'#a8e063',
+    ruck_won:'#f5c518',
+    first_breakdown:'#9060d0',
+    try:'#a8e063',
+    try_setup:'#30c4b0',
+    completed_pass:'#70b8e8',
+    missed_pass:'#f07830'
+  };
+  let currentMode = 'club';
+  let dashFilter = 'all';
+  let histFilter = 'all';
+  const counts = {};
+  KEYS.forEach(function (key) {
+    counts[key] = 0;
+  });
+  function byId(id) {
+    return document.getElementById(id);
+  }
+  function getMatches() {
+    try {
+      return JSON.parse(localStorage.getItem('joesRugbyMatches') || '[]');
+    } catch (e) {
+      return [];
+    }
+  }
+  function saveMatches(matches) {
+    localStorage.setItem('joesRugbyMatches', JSON.stringify(matches));
+  }
+  function showToast(message, error) {
+    const toast = byId('toast');
+    toast.textContent = message;
+    toast.className = 'toast' + (error ? ' err' : '');
+    setTimeout(function () {
+      toast.classList.add('show');
+    }, 10);
+    setTimeout(function () {
+      toast.classList.remove('show');
+    }, 2200);
+  }
+  function updateCount(stat) {
+    const el = byId('cnt-' + stat);
+    if (!el) return;
+    el.textContent = counts[stat];
+    el.classList.remove('pop');
+    void el.offsetWidth;
+    el.classList.add('pop');
+  }
+  function setMode(mode) {
+    currentMode = mode;
+    document.querySelectorAll('[data-mode]').forEach(function (btn) {
+      btn.className = 'mode-btn' + (btn.dataset.mode === mode ? ' active-' + mode : '');
+    });
+    const banner = byId('modeBanner');
+    banner.className = 'mode-banner ' + mode;
+    banner.textContent = (mode === 'club' ? '⚡ CLUB RUGBY' : '🎒 SCHOOL RUGBY') + ' — Recording Stats';
+  }
+  function showPage(page) {
+    document.querySelectorAll('.page').forEach(function (p) {
+      p.classList.remove('active');
+    });
+    document.querySelectorAll('.nav-tab').forEach(function (tab) {
+      tab.classList.remove('active');
+    });
+    byId('page-' + page).classList.add('active');
+    document.querySelector('[data-page="' + page + '"]').classList.add('active');
+    if (page === 'dashboard') renderDashboard();
+    if (page === 'history') renderHistory();
+  }
+  function increment(stat) {
+    if (!Object.prototype.hasOwnProperty.call(counts, stat)) return;
+    counts[stat] = counts[stat] + 1;
+    updateCount(stat);
+  }
+  function decrement(stat) {
+    if (!Object.prototype.hasOwnProperty.call(counts, stat)) return;
+    if (counts[stat] > 0) {
+      counts[stat] = counts[stat] - 1;
+      updateCount(stat);
+    }
+  }
+  function resetRecord(skipConfirm) {
+    if (!skipConfirm && !confirm('Clear all counts for new match?')) return;
+    KEYS.forEach(function (key) {
+      counts[key] = 0;
+      updateCount(key);
+    });
+    byId('opposition').value = '';
+    byId('scoreUs').value = 0;
+    byId('scoreThem').value = 0;
+    byId('matchDate').valueAsDate = new Date();
+  }
+  function saveMatch() {
+    const opposition = byId('opposition').value.trim();
+    const date = byId('matchDate').value;
+    if (!opposition) {
+      showToast('Enter opposition name', true);
+      return;
+    }
+    if (!date) {
+      showToast('Enter match date', true);
+      return;
+    }
+    const match = {
+      id: Date.now(),
+      date: date,
+      opposition: opposition,
+      mode: currentMode,
+      scoreUs: parseInt(byId('scoreUs').value, 10) || 0,
+      scoreThem: parseInt(byId('scoreThem').value, 10) || 0,
+      stats: Object.assign({}, counts)
+    };
+    const matches = getMatches();
+    matches.push(match);
+    matches.sort(function (a, b) {
+      return a.date.localeCompare(b.date);
+    });
+    saveMatches(matches);
+    showToast('✓ Match saved');
+    resetRecord(true);
+  }
+  function getFilteredMatches(filter) {
+    const matches = getMatches();
+    if (filter === 'all') return matches;
+    return matches.filter(function (match) {
+      return match.mode === filter;
+    });
+  }
+  function setDashFilter(filter) {
+    dashFilter = filter;
+    document.querySelectorAll('[data-dash-filter]').forEach(function (btn) {
+      btn.className = 'filter-btn' + (btn.dataset.dashFilter === filter ? ' active-' + filter : '');
+    });
+    renderDashboard();
+  }
+  function renderDashboard() {
+    const matches = getFilteredMatches(dashFilter);
+    const totals = {};
+    KEYS.forEach(function (key) {
+      totals[key] = matches.reduce(function (sum, match) {
+        return sum + ((match.stats && match.stats[key]) || 0);
+      }, 0);
+    });
+    byId('totalsRow').innerHTML = KEYS.map(function (key) {
+      return '<div class="total-card">' +
+        '<div class="total-val" style="color:' + COLORS[key] + '">' + totals[key] + '</div>' +
+        '<div class="total-lbl">' + LABELS[key] + '</div>' +
+        '</div>';
+    }).join('');
+    const selected = byId('statPicker').value;
+    byId('chartTitle').textContent = LABELS[selected] + ' — Match by Match';
+    if (!matches.length) {
+      byId('barChart').innerHTML = '<div class="empty">No matches saved yet.</div>';
+      return;
+    }
+    const maxValue = Math.max(
+      1,
+      ...matches.map(function (match) {
+        return (match.stats && match.stats[selected]) || 0;
+      })
+    );
+    byId('barChart').innerHTML = matches.map(function (match) {
+      const value = (match.stats && match.stats[selected]) || 0;
+      const width = Math.round((value / maxValue) * 100);
+      const date = new Date(match.date + 'T00:00:00').toLocaleDateString('en-GB', {
+        day:'numeric',
+        month:'short'
+      });
+      const color = match.mode === 'club' ? '#f5c518' : '#3a8fd4';
+      return '<div class="bar-row">' +
+        '<div class="bar-label"><span>' + date + ' vs ' + escapeHtml(match.opposition) + '</span><strong>' + value + '</strong></div>' +
+        '<div class="bar-track"><div class="bar-fill" style="width:' + width + '%; background:' + color + ';"></div></div>' +
+        '</div>';
+    }).join('');
+  }
+  function setHistFilter(filter) {
+    histFilter = filter;
+    document.querySelectorAll('[data-hist-filter]').forEach(function (btn) {
+      btn.className = 'filter-btn' + (btn.dataset.histFilter === filter ? ' active-' + filter : '');
+    });
+    renderHistory();
+  }
+  function renderHistory() {
+    const matches = getFilteredMatches(histFilter).slice().reverse();
+    byId('matchCount').textContent = '(' + matches.length + ')';
+    if (!matches.length) {
+      byId('matchList').innerHTML = '<div class="empty">🏉<br>No matches saved yet.</div>';
+      return;
+    }
+    byId('matchList').innerHTML = matches.map(function (match) {
+      const date = new Date(match.date + 'T00:00:00').toLocaleDateString('en-GB', {
+        weekday:'short',
+        day:'numeric',
+        month:'long',
+        year:'numeric'
+      });
+      const mode = match.mode || 'club';
+      return '<div class="match-card">' +
+        '<div class="match-head" data-open-match="' + match.id + '">' +
+          '<div>' +
+            '<span class="badge ' + mode + '">' + mode + '</span>' +
+            '<div class="opp">vs ' + escapeHtml(match.opposition) + '</div>' +
+            '<div class="date">' + date + '</div>' +
+          '</div>' +
+          '<div class="score">' + match.scoreUs + '–' + match.scoreThem + '</div>' +
+        '</div>' +
+        '<div class="match-body" id="match-body-' + match.id + '">' +
+          '<div class="match-stats">' +
+            KEYS.map(function (key) {
+              return '<div class="small-stat">' +
+                '<div class="small-val" style="color:' + COLORS[key] + '">' + ((match.stats && match.stats[key]) || 0) + '</div>' +
+                '<div class="small-lbl">' + LABELS[key] + '</div>' +
+                '</div>';
+            }).join('') +
+          '</div>' +
+          '<button class="delete-btn" data-delete-match="' + match.id + '">Delete Match</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+  function deleteMatch(id) {
+    if (!confirm('Delete this match?')) return;
+    const matches = getMatches().filter(function (match) {
+      return String(match.id) !== String(id);
+    });
+    saveMatches(matches);
+    renderHistory();
+    renderDashboard();
+  }
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
+  document.querySelectorAll('[data-mode]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      setMode(btn.dataset.mode);
+    });
+  });
+  document.querySelectorAll('[data-page]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      showPage(btn.dataset.page);
+    });
+  });
+  document.querySelectorAll('[data-stat]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      increment(btn.dataset.stat);
+    });
+  });
+  document.querySelectorAll('[data-minus]').forEach(function (btn) {
+    btn.addEventListener('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      decrement(btn.dataset.minus);
+    });
+  });
+  document.querySelectorAll('[data-dash-filter]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      setDashFilter(btn.dataset.dashFilter);
+    });
+  });
+  document.querySelectorAll('[data-hist-filter]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      setHistFilter(btn.dataset.histFilter);
+    });
+  });
+  byId('saveBtn').addEventListener('click', saveMatch);
+  byId('resetBtn').addEventListener('click', function () {
+    resetRecord(false);
+  });
+  byId('statPicker').addEventListener('change', renderDashboard);
+  document.addEventListener('click', function (event) {
+    const openTarget = event.target.closest('[data-open-match]');
+    if (openTarget) {
+      const body = byId('match-body-' + openTarget.dataset.openMatch);
+      if (body) body.classList.toggle('open');
+      return;
+    }
+    const deleteTarget = event.target.closest('[data-delete-match]');
+    if (deleteTarget) {
+      event.preventDefault();
+      event.stopPropagation();
+      deleteMatch(deleteTarget.dataset.deleteMatch);
+    }
+  });
+  byId('matchDate').valueAsDate = new Date();
+});
+</script>
+</body>
+</html>
