@@ -150,6 +150,7 @@ body {
   border-radius:22px;
   padding:16px;
   margin-bottom:14px;
+  overflow:hidden;
 }
 
 .section-title {
@@ -174,7 +175,7 @@ body {
   display:grid;
   grid-template-columns:1fr auto 1fr;
   gap:12px;
-  align-items:center;
+  align-items:start;
 }
 
 .team-box {
@@ -195,38 +196,10 @@ body {
   font-weight:900;
   line-height:1.15;
   word-break:break-word;
-}
-
-.badge-wrap {
-  height:86px;
+  min-height:2.6em;
   display:flex;
   align-items:center;
   justify-content:center;
-  margin-top:10px;
-}
-
-.badge-img {
-  max-width:78px;
-  max-height:84px;
-  object-fit:contain;
-}
-
-.badge-fallback {
-  width:76px;
-  height:76px;
-  border-radius:18px;
-  background:var(--green2);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:900;
-  font-size:1.2rem;
-}
-
-.big-v {
-  font-size:2.7rem;
-  font-weight:900;
-  color:white;
 }
 
 .opposition-input {
@@ -239,6 +212,29 @@ body {
   font-size:1rem;
   text-align:center;
   font-weight:800;
+}
+
+.big-v {
+  font-size:2.2rem;
+  font-weight:900;
+  color:white;
+  align-self:center;
+  padding-top:28px;
+}
+
+/* Score under each team */
+.team-score-input {
+  width:76px;
+  height:66px;
+  margin:14px auto 0;
+  background:rgba(0,0,0,.35);
+  border:2px solid var(--border);
+  border-radius:16px;
+  color:white;
+  text-align:center;
+  font-size:2rem;
+  font-weight:900;
+  display:block;
 }
 
 .home-away {
@@ -282,54 +278,28 @@ body {
 
 .date-box {
   margin-bottom:18px;
+  text-align:center;
 }
 
 input[type="date"] {
+  -webkit-appearance:none;
+  appearance:none;
   width:100%;
-  max-width:520px;
+  max-width:100%;
+  box-sizing:border-box;
   display:block;
   margin:0 auto;
   background:rgba(0,0,0,.35);
   border:2px solid var(--border);
   border-radius:16px;
   color:white;
-  padding:15px;
+  padding:15px 10px;
   font-size:1.2rem;
   text-align:center;
 }
 
 .score-card {
   text-align:center;
-}
-
-.score-row {
-  display:grid;
-  grid-template-columns:1fr auto auto auto 1fr;
-  gap:10px;
-  align-items:center;
-}
-
-.score-team {
-  font-weight:900;
-  font-size:.95rem;
-  word-break:break-word;
-}
-
-.score-input {
-  width:76px;
-  height:66px;
-  background:rgba(0,0,0,.35);
-  border:2px solid var(--border);
-  border-radius:16px;
-  color:white;
-  text-align:center;
-  font-size:2rem;
-  font-weight:900;
-}
-
-.score-dash {
-  font-size:1.8rem;
-  font-weight:900;
 }
 
 .helper {
@@ -364,7 +334,7 @@ input[type="date"] {
   background:var(--panel2);
   color:white;
   text-align:left;
-  padding:12px 42px 10px 14px;
+  padding:12px 14px 36px 14px;
   cursor:pointer;
   user-select:none;
   touch-action:manipulation;
@@ -394,12 +364,18 @@ input[type="date"] {
   font-weight:900;
   text-transform:uppercase;
   color:var(--muted);
+  display:block;
+  padding-right:34px;
 }
 
 .stat-count {
+  position:absolute;
+  right:14px;
+  bottom:10px;
   color:var(--c);
   font-size:2rem;
   font-weight:900;
+  line-height:1;
 }
 
 .minus-btn {
@@ -661,19 +637,23 @@ input[type="date"] {
 
 @media (max-width:520px) {
   .fixture-grid {
-    grid-template-columns:1fr;
+    grid-template-columns:1fr auto 1fr;
+    gap:6px;
   }
 
   .big-v {
-    font-size:2.2rem;
+    font-size:1.6rem;
+    padding-top:24px;
   }
 
-  .score-row {
-    grid-template-columns:1fr;
+  .team-name {
+    font-size:1rem;
   }
 
-  .score-dash {
-    line-height:1;
+  .team-score-input {
+    width:64px;
+    height:58px;
+    font-size:1.6rem;
   }
 }
 </style>
@@ -713,10 +693,7 @@ input[type="date"] {
         <div class="team-box">
           <div class="team-label">Joe's Team</div>
           <div class="team-name" id="fixtureUsName">Old Anselmians</div>
-          <div class="badge-wrap">
-            <img class="badge-img" id="teamBadge" src="anselmians-badge.png" alt="Team badge" onerror="this.style.display='none';document.getElementById('teamFallback').style.display='flex';">
-            <div class="badge-fallback" id="teamFallback" style="display:none;">OA</div>
-          </div>
+          <input class="team-score-input" type="number" id="scoreUs" value="0" min="0">
         </div>
 
         <div class="big-v">V</div>
@@ -724,9 +701,7 @@ input[type="date"] {
         <div class="team-box">
           <div class="team-label">Opposition</div>
           <input class="opposition-input" id="opposition" type="text" placeholder="e.g. Caldy">
-          <div class="badge-wrap">
-            <div class="badge-fallback">🏉</div>
-          </div>
+          <input class="team-score-input" type="number" id="scoreThem" value="0" min="0">
         </div>
       </div>
     </div>
@@ -745,15 +720,7 @@ input[type="date"] {
     </div>
 
     <div class="score-card">
-      <div class="form-label">Final Score</div>
-      <div class="score-row">
-        <div class="score-team" id="scoreUsLabel">Old Anselmians</div>
-        <input class="score-input" type="number" id="scoreUs" value="0" min="0">
-        <div class="score-dash">-</div>
-        <input class="score-input" type="number" id="scoreThem" value="0" min="0">
-        <div class="score-team" id="scoreThemLabel">Opposition</div>
-      </div>
-      <div class="helper">Opposition name above will appear here automatically.</div>
+      <div class="helper">Final score is set above, under each team name.</div>
     </div>
   </section>
 
@@ -880,14 +847,6 @@ document.addEventListener('DOMContentLoaded', function () {
     return mode === 'school' ? 'Wirral Grammar' : 'Old Anselmians';
   }
 
-  function getBadge(mode) {
-    return mode === 'school' ? 'wirral-grammar-badge.png' : 'anselmians-badge.png';
-  }
-
-  function getInitials(mode) {
-    return mode === 'school' ? 'WGS' : 'OA';
-  }
-
   function getMatches() {
     try {
       return JSON.parse(localStorage.getItem('joesRugbyMatches') || '[]');
@@ -923,11 +882,6 @@ document.addEventListener('DOMContentLoaded', function () {
       .replaceAll("'", '&#039;');
   }
 
-  function updateOppositionLabels() {
-    const opposition = byId('opposition').value.trim();
-    byId('scoreThemLabel').textContent = opposition || 'Opposition';
-  }
-
   function setMode(mode) {
     currentMode = mode;
 
@@ -940,15 +894,6 @@ document.addEventListener('DOMContentLoaded', function () {
       : 'Club Rugby — Old Anselmians';
 
     byId('fixtureUsName').textContent = getTeamName(mode);
-    byId('scoreUsLabel').textContent = getShortTeamName(mode);
-
-    const badge = byId('teamBadge');
-    const fallback = byId('teamFallback');
-
-    fallback.style.display = 'none';
-    badge.style.display = 'block';
-    badge.src = getBadge(mode);
-    fallback.textContent = getInitials(mode);
   }
 
   function setLocation(type) {
@@ -1006,7 +951,6 @@ document.addEventListener('DOMContentLoaded', function () {
     byId('scoreUs').value = 0;
     byId('scoreThem').value = 0;
     byId('matchDate').valueAsDate = new Date();
-    updateOppositionLabels();
   }
 
   function saveMatch() {
@@ -1227,7 +1171,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  byId('opposition').addEventListener('input', updateOppositionLabels);
   byId('saveBtn').addEventListener('click', saveMatch);
   byId('resetBtn').addEventListener('click', function () {
     resetRecord(false);
@@ -1253,7 +1196,6 @@ document.addEventListener('DOMContentLoaded', function () {
   byId('matchDate').valueAsDate = new Date();
   setMode('club');
   setLocation('home');
-  updateOppositionLabels();
 });
 </script>
 
