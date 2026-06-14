@@ -368,6 +368,186 @@ input[type="date"] {
   padding-right:34px;
 }
 
+/* ── Time on Pitch widget ────────────────────── */
+.time-card {
+  text-align:center;
+}
+
+.time-display {
+  font-size:3rem;
+  font-weight:900;
+  font-family:Arial, sans-serif;
+  letter-spacing:2px;
+  margin:6px 0 14px;
+  color:var(--green);
+}
+
+.time-display.paused {
+  color:var(--gold);
+}
+
+.time-buttons {
+  display:flex;
+  gap:8px;
+  max-width:520px;
+  margin:0 auto;
+}
+
+.time-btn {
+  flex:1;
+  border:2px solid var(--border);
+  border-radius:14px;
+  padding:14px 8px;
+  font-weight:900;
+  font-size:.95rem;
+  cursor:pointer;
+  background:rgba(0,0,0,.35);
+  color:var(--white);
+}
+
+.time-btn.start {
+  background:linear-gradient(135deg,var(--green2),var(--green));
+  border:0;
+  color:white;
+}
+
+.time-btn.pause {
+  background:linear-gradient(135deg,#c79a10,var(--gold));
+  border:0;
+  color:#120c03;
+}
+
+.time-btn.reset {
+  color:var(--muted);
+}
+
+.time-status {
+  color:var(--muted);
+  font-size:.78rem;
+  text-transform:uppercase;
+  font-weight:900;
+  letter-spacing:1px;
+  margin-top:10px;
+}
+
+/* ── Match Report section ────────────────────── */
+.report-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-bottom:14px;
+}
+
+.report-grid .full {
+  grid-column:1/-1;
+}
+
+.report-field label {
+  display:block;
+  color:var(--green);
+  font-size:.8rem;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  margin-bottom:8px;
+  text-align:center;
+}
+
+.report-field select,
+.report-field input[type="text"],
+.report-field textarea {
+  width:100%;
+  background:rgba(0,0,0,.35);
+  border:2px solid var(--border);
+  border-radius:14px;
+  color:white;
+  padding:12px;
+  font-size:1rem;
+  font-family:Arial, sans-serif;
+}
+
+.report-field textarea {
+  resize:vertical;
+  min-height:90px;
+}
+
+.report-field select {
+  text-align:center;
+  -webkit-appearance:none;
+  appearance:none;
+}
+
+.cards-list {
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-bottom:10px;
+}
+
+.card-row {
+  display:grid;
+  grid-template-columns:1fr 110px 36px;
+  gap:8px;
+  align-items:center;
+}
+
+.card-row input[type="text"] {
+  width:100%;
+  background:rgba(0,0,0,.35);
+  border:2px solid var(--border);
+  border-radius:12px;
+  color:white;
+  padding:10px;
+  font-size:.95rem;
+}
+
+.card-row select {
+  width:100%;
+  background:rgba(0,0,0,.35);
+  border:2px solid var(--border);
+  border-radius:12px;
+  color:white;
+  padding:10px;
+  font-size:.9rem;
+  text-align:center;
+  -webkit-appearance:none;
+  appearance:none;
+}
+
+.card-row .remove-card {
+  width:36px;
+  height:36px;
+  border-radius:10px;
+  border:2px solid var(--border);
+  background:rgba(232,64,64,.15);
+  color:var(--red);
+  font-weight:900;
+  font-size:1.1rem;
+  cursor:pointer;
+}
+
+.add-card-btn {
+  width:100%;
+  border:2px dashed var(--border);
+  border-radius:12px;
+  background:transparent;
+  color:var(--muted);
+  font-weight:900;
+  padding:10px;
+  cursor:pointer;
+  margin-bottom:10px;
+}
+
+@media (max-width:520px) {
+  .report-grid {
+    grid-template-columns:1fr;
+  }
+
+  .time-display {
+    font-size:2.4rem;
+  }
+}
+
 .stat-count {
   position:absolute;
   right:14px;
@@ -607,6 +787,28 @@ input[type="date"] {
   padding:8px 12px;
 }
 
+.match-report {
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid var(--border);
+}
+
+.report-line {
+  font-size:.85rem;
+  color:var(--white);
+  margin-bottom:6px;
+  line-height:1.4;
+}
+
+.report-line strong {
+  color:var(--green);
+  font-weight:900;
+}
+
+.report-notes {
+  white-space:pre-wrap;
+}
+
 .empty {
   text-align:center;
   color:var(--muted);
@@ -724,6 +926,17 @@ input[type="date"] {
     </div>
   </section>
 
+  <section class="card time-card">
+    <div class="section-title">⏱️ Time on Pitch</div>
+    <div class="time-display" id="timeDisplay">00:00</div>
+    <div class="time-buttons">
+      <button class="time-btn start" id="timeStartBtn">▶ Start</button>
+      <button class="time-btn pause" id="timePauseBtn">⏸ Pause</button>
+      <button class="time-btn reset" id="timeResetBtn">↺ Reset</button>
+    </div>
+    <div class="time-status" id="timeStatus">Not started</div>
+  </section>
+
   <div class="stats-label">Tap a stat to add · use − to correct</div>
 
   <section class="stat-grid">
@@ -736,6 +949,47 @@ input[type="date"] {
     <div class="stat-btn btn-trysetup" data-stat="try_setup"><span class="stat-name">Try Set Up</span><span class="stat-count" id="cnt-try_setup">0</span><span class="minus-btn" data-minus="try_setup">−</span></div>
     <div class="stat-btn btn-pass" data-stat="completed_pass"><span class="stat-name">Completed Pass</span><span class="stat-count" id="cnt-completed_pass">0</span><span class="minus-btn" data-minus="completed_pass">−</span></div>
     <div class="stat-btn btn-misspass wide" data-stat="missed_pass"><span class="stat-name">Missed Pass</span><span class="stat-count" id="cnt-missed_pass">0</span><span class="minus-btn" data-minus="missed_pass">−</span></div>
+  </section>
+
+  <section class="card">
+    <div class="section-title">📝 Match Report</div>
+
+    <div class="report-grid">
+      <div class="report-field">
+        <label>Weather</label>
+        <select id="weather">
+          <option value="">Select…</option>
+          <option value="☀️ Sunny">☀️ Sunny</option>
+          <option value="⛅ Cloudy">⛅ Cloudy</option>
+          <option value="🌧️ Wet">🌧️ Wet</option>
+          <option value="💨 Windy">💨 Windy</option>
+          <option value="❄️ Cold">❄️ Cold</option>
+          <option value="🥵 Hot">🥵 Hot</option>
+          <option value="🌫️ Foggy">🌫️ Foggy</option>
+        </select>
+      </div>
+
+      <div class="report-field">
+        <label>Player of the Match</label>
+        <input type="text" id="motm" placeholder="e.g. Joe">
+      </div>
+
+      <div class="report-field full">
+        <label>Special Mentions</label>
+        <input type="text" id="mentions" placeholder="e.g. Great effort from the front row">
+      </div>
+
+      <div class="report-field full">
+        <label>Cards / Sendings Off</label>
+        <div class="cards-list" id="cardsList"></div>
+        <button class="add-card-btn" id="addCardBtn">+ Add Card</button>
+      </div>
+
+      <div class="report-field full">
+        <label>Match Notes</label>
+        <textarea id="matchNotes" placeholder="How did Joe play? Any highlights, areas to work on, general thoughts on the game..."></textarea>
+      </div>
+    </div>
   </section>
 
   <button class="save-btn" id="saveBtn">💾 Save Match</button>
@@ -834,6 +1088,16 @@ document.addEventListener('DOMContentLoaded', function () {
   KEYS.forEach(function (key) {
     counts[key] = 0;
   });
+
+  // ── Time on Pitch (stopwatch) state ──────────────────────────────
+  let timeElapsedMs = 0;     // accumulated time while running
+  let timeRunning = false;
+  let timeIntervalId = null;
+  let timeLastStart = null;
+
+  // ── Cards / sendings off state ───────────────────────────────────
+  let cardRows = [];
+  let cardRowIdCounter = 0;
 
   function byId(id) {
     return document.getElementById(id);
@@ -939,6 +1203,116 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  // ── Time on Pitch (stopwatch) ─────────────────────────────────────
+  function formatTime(ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    return String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+  }
+
+  function getCurrentElapsed() {
+    if (timeRunning && timeLastStart) {
+      return timeElapsedMs + (Date.now() - timeLastStart);
+    }
+    return timeElapsedMs;
+  }
+
+  function updateTimeDisplay() {
+    byId('timeDisplay').textContent = formatTime(getCurrentElapsed());
+  }
+
+  function timeStart() {
+    if (timeRunning) return;
+    timeRunning = true;
+    timeLastStart = Date.now();
+
+    if (timeIntervalId) clearInterval(timeIntervalId);
+    timeIntervalId = setInterval(updateTimeDisplay, 1000);
+
+    byId('timeDisplay').classList.remove('paused');
+    byId('timeStatus').textContent = getCurrentElapsed() > 0 ? 'On the pitch' : 'On the pitch — kicked off';
+    updateTimeDisplay();
+  }
+
+  function timePause() {
+    if (!timeRunning) return;
+    timeElapsedMs = getCurrentElapsed();
+    timeRunning = false;
+    timeLastStart = null;
+
+    if (timeIntervalId) {
+      clearInterval(timeIntervalId);
+      timeIntervalId = null;
+    }
+
+    byId('timeDisplay').classList.add('paused');
+    byId('timeStatus').textContent = 'Off the pitch / paused';
+    updateTimeDisplay();
+  }
+
+  function timeReset(skipConfirm) {
+    if (!skipConfirm && getCurrentElapsed() > 0 && !confirm('Reset time on pitch?')) return;
+
+    if (timeIntervalId) {
+      clearInterval(timeIntervalId);
+      timeIntervalId = null;
+    }
+
+    timeElapsedMs = 0;
+    timeRunning = false;
+    timeLastStart = null;
+
+    byId('timeDisplay').classList.remove('paused');
+    byId('timeStatus').textContent = 'Not started';
+    updateTimeDisplay();
+  }
+
+  // ── Cards / Sendings Off list ─────────────────────────────────────
+  function renderCardsList() {
+    byId('cardsList').innerHTML = cardRows.map(function (row) {
+      return '<div class="card-row" data-card-row="' + row.id + '">' +
+        '<input type="text" placeholder="Player name" value="' + escapeHtml(row.player) + '" data-card-player="' + row.id + '">' +
+        '<select data-card-type="' + row.id + '">' +
+          '<option value="Yellow"' + (row.type === 'Yellow' ? ' selected' : '') + '>🟨 Yellow</option>' +
+          '<option value="Red"' + (row.type === 'Red' ? ' selected' : '') + '>🟥 Red</option>' +
+        '</select>' +
+        '<button class="remove-card" data-card-remove="' + row.id + '">✕</button>' +
+      '</div>';
+    }).join('');
+
+    cardRows.forEach(function (row) {
+      const playerInput = document.querySelector('[data-card-player="' + row.id + '"]');
+      const typeSelect = document.querySelector('[data-card-type="' + row.id + '"]');
+      const removeBtn = document.querySelector('[data-card-remove="' + row.id + '"]');
+
+      if (playerInput) {
+        playerInput.addEventListener('input', function () {
+          row.player = playerInput.value;
+        });
+      }
+
+      if (typeSelect) {
+        typeSelect.addEventListener('change', function () {
+          row.type = typeSelect.value;
+        });
+      }
+
+      if (removeBtn) {
+        removeBtn.addEventListener('click', function () {
+          cardRows = cardRows.filter(function (r) { return r.id !== row.id; });
+          renderCardsList();
+        });
+      }
+    });
+  }
+
+  function addCardRow() {
+    cardRowIdCounter++;
+    cardRows.push({ id: cardRowIdCounter, player: '', type: 'Yellow' });
+    renderCardsList();
+  }
+
   function resetRecord(skipConfirm) {
     if (!skipConfirm && !confirm('Clear all counts for new match?')) return;
 
@@ -951,6 +1325,15 @@ document.addEventListener('DOMContentLoaded', function () {
     byId('scoreUs').value = 0;
     byId('scoreThem').value = 0;
     byId('matchDate').valueAsDate = new Date();
+
+    byId('weather').value = '';
+    byId('motm').value = '';
+    byId('mentions').value = '';
+    byId('matchNotes').value = '';
+    cardRows = [];
+    renderCardsList();
+
+    timeReset(true);
   }
 
   function saveMatch() {
@@ -976,7 +1359,17 @@ document.addEventListener('DOMContentLoaded', function () {
       location: locationType,
       scoreUs: parseInt(byId('scoreUs').value, 10) || 0,
       scoreThem: parseInt(byId('scoreThem').value, 10) || 0,
-      stats: Object.assign({}, counts)
+      stats: Object.assign({}, counts),
+      timeOnPitchMs: getCurrentElapsed(),
+      report: {
+        weather: byId('weather').value,
+        motm: byId('motm').value.trim(),
+        mentions: byId('mentions').value.trim(),
+        notes: byId('matchNotes').value.trim(),
+        cards: cardRows
+          .filter(function (row) { return row.player.trim(); })
+          .map(function (row) { return { player: row.player.trim(), type: row.type }; })
+      }
     };
 
     const matches = getMatches();
@@ -1025,7 +1418,15 @@ document.addEventListener('DOMContentLoaded', function () {
         '<div class="total-val" style="color:' + COLORS[key] + '">' + totals[key] + '</div>' +
         '<div class="total-lbl">' + LABELS[key] + '</div>' +
         '</div>';
-    }).join('');
+    }).join('') + (function () {
+      const withTime = matches.filter(function (m) { return typeof m.timeOnPitchMs === 'number' && m.timeOnPitchMs > 0; });
+      if (!withTime.length) return '';
+      const avgMs = withTime.reduce(function (sum, m) { return sum + m.timeOnPitchMs; }, 0) / withTime.length;
+      return '<div class="total-card">' +
+        '<div class="total-val" style="color:' + COLORS.tackle + '">' + formatTime(avgMs) + '</div>' +
+        '<div class="total-lbl">Avg Time on Pitch</div>' +
+        '</div>';
+    })();
 
     const selected = byId('statPicker').value;
     byId('chartTitle').textContent = LABELS[selected] + ' — Match by Match';
@@ -1089,6 +1490,40 @@ document.addEventListener('DOMContentLoaded', function () {
 
       const mode = match.mode || 'club';
       const location = match.location === 'away' ? 'Away' : 'Home';
+      const report = match.report || {};
+
+      let reportHtml = '';
+
+      if (typeof match.timeOnPitchMs === 'number' && match.timeOnPitchMs > 0) {
+        reportHtml += '<div class="report-line"><strong>⏱️ Time on pitch:</strong> ' + formatTime(match.timeOnPitchMs) + '</div>';
+      }
+
+      if (report.weather) {
+        reportHtml += '<div class="report-line"><strong>Weather:</strong> ' + escapeHtml(report.weather) + '</div>';
+      }
+
+      if (report.motm) {
+        reportHtml += '<div class="report-line"><strong>⭐ Player of the Match:</strong> ' + escapeHtml(report.motm) + '</div>';
+      }
+
+      if (report.mentions) {
+        reportHtml += '<div class="report-line"><strong>Special mentions:</strong> ' + escapeHtml(report.mentions) + '</div>';
+      }
+
+      if (report.cards && report.cards.length) {
+        reportHtml += '<div class="report-line"><strong>Cards:</strong> ' + report.cards.map(function (c) {
+          const icon = c.type === 'Red' ? '🟥' : '🟨';
+          return icon + ' ' + escapeHtml(c.player);
+        }).join(', ') + '</div>';
+      }
+
+      if (report.notes) {
+        reportHtml += '<div class="report-line report-notes"><strong>Notes:</strong> ' + escapeHtml(report.notes) + '</div>';
+      }
+
+      if (reportHtml) {
+        reportHtml = '<div class="match-report">' + reportHtml + '</div>';
+      }
 
       return '<div class="match-card">' +
         '<div class="match-head" data-open-match="' + match.id + '">' +
@@ -1109,6 +1544,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 '</div>';
             }).join('') +
           '</div>' +
+          reportHtml +
           '<button class="delete-btn" data-delete-match="' + match.id + '">Delete Match</button>' +
         '</div>' +
       '</div>';
@@ -1193,9 +1629,19 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
+  byId('timeStartBtn').addEventListener('click', timeStart);
+  byId('timePauseBtn').addEventListener('click', timePause);
+  byId('timeResetBtn').addEventListener('click', function () {
+    timeReset(false);
+  });
+
+  byId('addCardBtn').addEventListener('click', addCardRow);
+
   byId('matchDate').valueAsDate = new Date();
   setMode('club');
   setLocation('home');
+  renderCardsList();
+  updateTimeDisplay();
 });
 </script>
 
