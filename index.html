@@ -1276,7 +1276,7 @@ document.addEventListener('DOMContentLoaded', function () {
         matches.sort(function (a, b) { return String(a.date).localeCompare(String(b.date)); });
         matchesCache = matches;
         saveLocalMatches(matches);
-        setSyncStatus('ok', 'Synced with Google Sheet');
+        setSyncStatus('ok', 'Synced with Database');
         if (callback) callback();
       })
       .catch(function () {
@@ -1297,7 +1297,7 @@ document.addEventListener('DOMContentLoaded', function () {
     matchesCache.sort(function (a, b) { return String(a.date).localeCompare(String(b.date)); });
     saveLocalMatches(matchesCache);
 
-    setSyncStatus('syncing', 'Saving to Google Sheet…');
+    setSyncStatus('syncing', 'Saving to Database…');
 
     fetch(SHEET_API_URL, {
       method: 'POST',
@@ -1306,7 +1306,7 @@ document.addEventListener('DOMContentLoaded', function () {
     })
       .then(function (res) { return res.json(); })
       .then(function () {
-        setSyncStatus('ok', 'Synced with Google Sheet');
+        setSyncStatus('ok', 'Synced with Database');
         if (onDone) onDone(true);
       })
       .catch(function () {
@@ -1319,7 +1319,7 @@ document.addEventListener('DOMContentLoaded', function () {
     matchesCache = matchesCache.filter(function (m) { return String(m.id) !== String(id); });
     saveLocalMatches(matchesCache);
 
-    setSyncStatus('syncing', 'Deleting from Google Sheet…');
+    setSyncStatus('syncing', 'Deleting from Database…');
 
     fetch(SHEET_API_URL, {
       method: 'POST',
@@ -1328,7 +1328,7 @@ document.addEventListener('DOMContentLoaded', function () {
     })
       .then(function (res) { return res.json(); })
       .then(function () {
-        setSyncStatus('ok', 'Synced with Google Sheet');
+        setSyncStatus('ok', 'Synced with Database');
         if (onDone) onDone(true);
       })
       .catch(function () {
