@@ -21,6 +21,8 @@
   --orange:#f07830;
   --teal:#30c4b0;
   --purple:#9060d0;
+  --pink:#e85aa0;
+  --cyan:#4ad6e8;
 }
 
 * {
@@ -144,6 +146,45 @@ body {
   background:rgba(0,0,0,.25);
 }
 
+/* ── Sync status bar ───────────────────────────── */
+.sync-bar {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:8px 12px;
+  border-radius:12px;
+  margin-bottom:12px;
+  font-size:.75rem;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  border:1.5px solid var(--border);
+  background:rgba(0,0,0,.2);
+  color:var(--muted);
+}
+
+.sync-bar.ok { color:var(--green); border-color:var(--green2); }
+.sync-bar.err { color:var(--red); border-color:rgba(232,64,64,.4); }
+.sync-bar.syncing { color:var(--gold); }
+
+.sync-dot {
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  background:currentColor;
+  flex-shrink:0;
+}
+
+.sync-bar.syncing .sync-dot {
+  animation:pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%,100% { opacity:1; }
+  50% { opacity:.3; }
+}
+
 .card {
   background:var(--panel);
   border:2px solid var(--border);
@@ -222,7 +263,6 @@ body {
   padding-top:28px;
 }
 
-/* Score under each team */
 .team-score-input {
   width:76px;
   height:66px;
@@ -368,6 +408,43 @@ input[type="date"] {
   padding-right:34px;
 }
 
+.stat-count {
+  position:absolute;
+  right:14px;
+  bottom:10px;
+  color:var(--c);
+  font-size:2rem;
+  font-weight:900;
+  line-height:1;
+}
+
+.minus-btn {
+  position:absolute;
+  right:8px;
+  top:8px;
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  background:rgba(255,255,255,.1);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+  color:var(--muted);
+}
+
+.btn-tackle { --c:var(--blue); }
+.btn-miss { --c:var(--red); }
+.btn-counter { --c:var(--green); }
+.btn-ruck { --c:var(--gold); }
+.btn-rucklost { --c:var(--pink); }
+.btn-carries { --c:var(--cyan); }
+.btn-breakdown { --c:var(--purple); }
+.btn-try { --c:var(--green); }
+.btn-trysetup { --c:var(--teal); }
+.btn-pass { --c:#70b8e8; }
+.btn-misspass { --c:var(--orange); }
+
 /* ── Time on Pitch widget ────────────────────── */
 .time-card {
   text-align:center;
@@ -471,10 +548,30 @@ input[type="date"] {
   min-height:90px;
 }
 
-.report-field select {
-  text-align:center;
-  -webkit-appearance:none;
-  appearance:none;
+/* Weather multi-select chips */
+.weather-chips {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  justify-content:center;
+}
+
+.weather-chip {
+  border:2px solid var(--border);
+  border-radius:999px;
+  background:rgba(0,0,0,.35);
+  color:var(--muted);
+  padding:9px 14px;
+  font-weight:900;
+  font-size:.9rem;
+  cursor:pointer;
+  user-select:none;
+}
+
+.weather-chip.active {
+  background:linear-gradient(135deg,var(--green2),var(--green));
+  color:white;
+  border-color:var(--green);
 }
 
 .cards-list {
@@ -538,53 +635,23 @@ input[type="date"] {
   margin-bottom:10px;
 }
 
-@media (max-width:520px) {
-  .report-grid {
-    grid-template-columns:1fr;
-  }
-
-  .time-display {
-    font-size:2.4rem;
-  }
-}
-
-.stat-count {
-  position:absolute;
-  right:14px;
-  bottom:10px;
-  color:var(--c);
-  font-size:2rem;
+.editing-banner {
+  background:rgba(245,197,24,.15);
+  border:1.5px solid var(--gold);
+  color:var(--gold);
+  border-radius:12px;
+  padding:10px 12px;
   font-weight:900;
-  line-height:1;
+  text-align:center;
+  margin-bottom:12px;
+  font-size:.85rem;
+  text-transform:uppercase;
+  letter-spacing:1px;
 }
-
-.minus-btn {
-  position:absolute;
-  right:8px;
-  top:8px;
-  width:28px;
-  height:28px;
-  border-radius:50%;
-  background:rgba(255,255,255,.1);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:900;
-  color:var(--muted);
-}
-
-.btn-tackle { --c:var(--blue); }
-.btn-miss { --c:var(--red); }
-.btn-counter { --c:var(--green); }
-.btn-ruck { --c:var(--gold); }
-.btn-breakdown { --c:var(--purple); }
-.btn-try { --c:var(--green); }
-.btn-trysetup { --c:var(--teal); }
-.btn-pass { --c:#70b8e8; }
-.btn-misspass { --c:var(--orange); }
 
 .save-btn,
-.reset-btn {
+.reset-btn,
+.cancel-edit-btn {
   width:100%;
   border-radius:14px;
   padding:16px;
@@ -601,7 +668,8 @@ input[type="date"] {
   border:0;
 }
 
-.reset-btn {
+.reset-btn,
+.cancel-edit-btn {
   background:rgba(0,0,0,.25);
   color:var(--muted);
   border:2px solid rgba(255,255,255,.15);
@@ -681,27 +749,29 @@ input[type="date"] {
   margin-bottom:12px;
 }
 
-.bar-row {
-  margin:10px 0;
+/* ── Line chart ─────────────────────────────── */
+.line-chart-wrap {
+  overflow-x:auto;
 }
 
-.bar-label {
+.line-chart-legend {
   display:flex;
-  justify-content:space-between;
+  gap:16px;
+  justify-content:center;
+  margin-top:8px;
+  font-size:.75rem;
   color:var(--muted);
-  font-size:.8rem;
-  margin-bottom:4px;
+  font-weight:900;
+  text-transform:uppercase;
 }
 
-.bar-track {
-  height:16px;
-  background:rgba(0,0,0,.35);
-  border-radius:999px;
-  overflow:hidden;
-}
-
-.bar-fill {
-  height:100%;
+.legend-dot {
+  display:inline-block;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  margin-right:4px;
+  vertical-align:middle;
 }
 
 .match-head {
@@ -778,15 +848,6 @@ input[type="date"] {
   text-transform:uppercase;
 }
 
-.delete-btn {
-  margin-top:10px;
-  border:1px solid rgba(232,64,64,.4);
-  background:transparent;
-  color:var(--red);
-  border-radius:8px;
-  padding:8px 12px;
-}
-
 .match-report {
   margin-top:12px;
   padding-top:12px;
@@ -809,6 +870,34 @@ input[type="date"] {
   white-space:pre-wrap;
 }
 
+.match-actions {
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+
+.edit-btn,
+.delete-btn {
+  flex:1;
+  border-radius:8px;
+  padding:8px 12px;
+  font-weight:900;
+  cursor:pointer;
+  text-align:center;
+}
+
+.edit-btn {
+  border:1px solid rgba(118,196,59,.4);
+  background:transparent;
+  color:var(--green);
+}
+
+.delete-btn {
+  border:1px solid rgba(232,64,64,.4);
+  background:transparent;
+  color:var(--red);
+}
+
 .empty {
   text-align:center;
   color:var(--muted);
@@ -827,6 +916,8 @@ input[type="date"] {
   font-weight:900;
   transition:.25s;
   z-index:99;
+  text-align:center;
+  max-width:90%;
 }
 
 .toast.show {
@@ -857,6 +948,14 @@ input[type="date"] {
     height:58px;
     font-size:1.6rem;
   }
+
+  .report-grid {
+    grid-template-columns:1fr;
+  }
+
+  .time-display {
+    font-size:2.4rem;
+  }
 }
 </style>
 </head>
@@ -885,7 +984,11 @@ input[type="date"] {
 </header>
 
 <main class="page active" id="page-record">
+  <div class="sync-bar" id="syncBar"><span class="sync-dot"></span><span id="syncBarText">Connecting…</span></div>
+
   <div id="modeBanner" class="mode-banner">Club Rugby — Old Anselmians</div>
+
+  <div class="editing-banner" id="editingBanner" style="display:none;">✏️ Editing saved match — Save Match will update it</div>
 
   <section class="card">
     <div class="section-title">📅 Match Details</div>
@@ -944,6 +1047,8 @@ input[type="date"] {
     <div class="stat-btn btn-miss" data-stat="miss_tackle"><span class="stat-name">Missed Tackle</span><span class="stat-count" id="cnt-miss_tackle">0</span><span class="minus-btn" data-minus="miss_tackle">−</span></div>
     <div class="stat-btn btn-counter" data-stat="counter_ruck"><span class="stat-name">Counter Ruck Won</span><span class="stat-count" id="cnt-counter_ruck">0</span><span class="minus-btn" data-minus="counter_ruck">−</span></div>
     <div class="stat-btn btn-ruck" data-stat="ruck_won"><span class="stat-name">Ruck Won</span><span class="stat-count" id="cnt-ruck_won">0</span><span class="minus-btn" data-minus="ruck_won">−</span></div>
+    <div class="stat-btn btn-rucklost" data-stat="ruck_lost"><span class="stat-name">Ruck Lost</span><span class="stat-count" id="cnt-ruck_lost">0</span><span class="minus-btn" data-minus="ruck_lost">−</span></div>
+    <div class="stat-btn btn-carries" data-stat="carries"><span class="stat-name">Carries</span><span class="stat-count" id="cnt-carries">0</span><span class="minus-btn" data-minus="carries">−</span></div>
     <div class="stat-btn btn-breakdown" data-stat="first_breakdown"><span class="stat-name">First to Breakdown</span><span class="stat-count" id="cnt-first_breakdown">0</span><span class="minus-btn" data-minus="first_breakdown">−</span></div>
     <div class="stat-btn btn-try" data-stat="try"><span class="stat-name">Try</span><span class="stat-count" id="cnt-try">0</span><span class="minus-btn" data-minus="try">−</span></div>
     <div class="stat-btn btn-trysetup" data-stat="try_setup"><span class="stat-name">Try Set Up</span><span class="stat-count" id="cnt-try_setup">0</span><span class="minus-btn" data-minus="try_setup">−</span></div>
@@ -955,18 +1060,17 @@ input[type="date"] {
     <div class="section-title">📝 Match Report</div>
 
     <div class="report-grid">
-      <div class="report-field">
-        <label>Weather</label>
-        <select id="weather">
-          <option value="">Select…</option>
-          <option value="☀️ Sunny">☀️ Sunny</option>
-          <option value="⛅ Cloudy">⛅ Cloudy</option>
-          <option value="🌧️ Wet">🌧️ Wet</option>
-          <option value="💨 Windy">💨 Windy</option>
-          <option value="❄️ Cold">❄️ Cold</option>
-          <option value="🥵 Hot">🥵 Hot</option>
-          <option value="🌫️ Foggy">🌫️ Foggy</option>
-        </select>
+      <div class="report-field full">
+        <label>Weather (select all that apply)</label>
+        <div class="weather-chips" id="weatherChips">
+          <div class="weather-chip" data-weather="☀️ Sunny">☀️ Sunny</div>
+          <div class="weather-chip" data-weather="⛅ Cloudy">⛅ Cloudy</div>
+          <div class="weather-chip" data-weather="🌧️ Wet">🌧️ Wet</div>
+          <div class="weather-chip" data-weather="💨 Windy">💨 Windy</div>
+          <div class="weather-chip" data-weather="❄️ Cold">❄️ Cold</div>
+          <div class="weather-chip" data-weather="🥵 Hot">🥵 Hot</div>
+          <div class="weather-chip" data-weather="🌫️ Foggy">🌫️ Foggy</div>
+        </div>
       </div>
 
       <div class="report-field">
@@ -974,9 +1078,9 @@ input[type="date"] {
         <input type="text" id="motm" placeholder="e.g. Joe">
       </div>
 
-      <div class="report-field full">
+      <div class="report-field">
         <label>Special Mentions</label>
-        <input type="text" id="mentions" placeholder="e.g. Great effort from the front row">
+        <input type="text" id="mentions" placeholder="e.g. Great front row">
       </div>
 
       <div class="report-field full">
@@ -993,8 +1097,10 @@ input[type="date"] {
   </section>
 
   <button class="save-btn" id="saveBtn">💾 Save Match</button>
+  <button class="cancel-edit-btn" id="cancelEditBtn" style="display:none;">✕ Cancel Edit</button>
   <button class="reset-btn" id="resetBtn">↺ Reset / New Match</button>
 </main>
+
 <main class="page" id="page-dashboard">
   <div class="page-title">Dashboard</div>
 
@@ -1013,6 +1119,8 @@ input[type="date"] {
       <option value="miss_tackle">Missed Tackles</option>
       <option value="counter_ruck">Counter Rucks Won</option>
       <option value="ruck_won">Rucks Won</option>
+      <option value="ruck_lost">Rucks Lost</option>
+      <option value="carries">Carries</option>
       <option value="first_breakdown">First to Breakdown</option>
       <option value="try">Tries</option>
       <option value="try_setup">Try Set Ups</option>
@@ -1023,7 +1131,11 @@ input[type="date"] {
 
   <section class="chart-card">
     <div class="page-title" id="chartTitle">Match by Match</div>
-    <div id="barChart"></div>
+    <div class="line-chart-wrap"><svg id="lineChart" width="100%" height="220"></svg></div>
+    <div class="line-chart-legend">
+      <span><span class="legend-dot" style="background:#f5c518"></span>Club</span>
+      <span><span class="legend-dot" style="background:#3a8fd4"></span>School</span>
+    </div>
   </section>
 </main>
 
@@ -1043,11 +1155,19 @@ input[type="date"] {
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+
+  // ════════════════════════════════════════════════════════════════
+  // CONFIG — Google Apps Script Web App URL
+  // ════════════════════════════════════════════════════════════════
+  const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbzj47mb3sULQiZb_N6h5F_tYYCMVXOaRRNis6nwGZX8sL3rTJFhK_RkXYQeDLHYVxmp/exec';
+
   const KEYS = [
     'tackle',
     'miss_tackle',
     'counter_ruck',
     'ruck_won',
+    'ruck_lost',
+    'carries',
     'first_breakdown',
     'try',
     'try_setup',
@@ -1060,6 +1180,8 @@ document.addEventListener('DOMContentLoaded', function () {
     miss_tackle:'Missed Tackles',
     counter_ruck:'Counter Rucks Won',
     ruck_won:'Rucks Won',
+    ruck_lost:'Rucks Lost',
+    carries:'Carries',
     first_breakdown:'First to Breakdown',
     try:'Tries',
     try_setup:'Try Set Ups',
@@ -1072,6 +1194,8 @@ document.addEventListener('DOMContentLoaded', function () {
     miss_tackle:'#e84040',
     counter_ruck:'#76c43b',
     ruck_won:'#f5c518',
+    ruck_lost:'#e85aa0',
+    carries:'#4ad6e8',
     first_breakdown:'#9060d0',
     try:'#76c43b',
     try_setup:'#30c4b0',
@@ -1090,7 +1214,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // ── Time on Pitch (stopwatch) state ──────────────────────────────
-  let timeElapsedMs = 0;     // accumulated time while running
+  let timeElapsedMs = 0;
   let timeRunning = false;
   let timeIntervalId = null;
   let timeLastStart = null;
@@ -1098,6 +1222,15 @@ document.addEventListener('DOMContentLoaded', function () {
   // ── Cards / sendings off state ───────────────────────────────────
   let cardRows = [];
   let cardRowIdCounter = 0;
+
+  // ── Weather multi-select state ───────────────────────────────────
+  let selectedWeather = [];
+
+  // ── Editing state ─────────────────────────────────────────────────
+  let editingMatchId = null;
+
+  // ── Data store (synced with Google Sheet, cached in localStorage) ─
+  let matchesCache = [];
 
   function byId(id) {
     return document.getElementById(id);
@@ -1107,11 +1240,10 @@ document.addEventListener('DOMContentLoaded', function () {
     return mode === 'school' ? 'Wirral Grammar Boys' : 'Old Anselmians';
   }
 
-  function getShortTeamName(mode) {
-    return mode === 'school' ? 'Wirral Grammar' : 'Old Anselmians';
-  }
-
-  function getMatches() {
+  // ════════════════════════════════════════════════════════════════
+  // DATA LAYER — Google Sheet sync with localStorage fallback/cache
+  // ════════════════════════════════════════════════════════════════
+  function loadLocalMatches() {
     try {
       return JSON.parse(localStorage.getItem('joesRugbyMatches') || '[]');
     } catch (e) {
@@ -1119,8 +1251,90 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  function saveMatches(matches) {
+  function saveLocalMatches(matches) {
     localStorage.setItem('joesRugbyMatches', JSON.stringify(matches));
+  }
+
+  function setSyncStatus(state, text) {
+    const bar = byId('syncBar');
+    bar.className = 'sync-bar ' + state;
+    byId('syncBarText').textContent = text;
+  }
+
+  function getMatches() {
+    return matchesCache;
+  }
+
+  // Fetch all matches from the Sheet. Falls back to local cache on failure.
+  function refreshFromSheet(callback) {
+    setSyncStatus('syncing', 'Syncing…');
+
+    fetch(SHEET_API_URL)
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        const matches = (data && data.matches) ? data.matches : [];
+        matches.sort(function (a, b) { return String(a.date).localeCompare(String(b.date)); });
+        matchesCache = matches;
+        saveLocalMatches(matches);
+        setSyncStatus('ok', 'Synced with Google Sheet');
+        if (callback) callback();
+      })
+      .catch(function () {
+        matchesCache = loadLocalMatches();
+        setSyncStatus('err', 'Offline — using saved data');
+        if (callback) callback();
+      });
+  }
+
+  // Save (insert/update) a match to the Sheet, with optimistic local update
+  function saveMatchToSheet(match, onDone) {
+    const idx = matchesCache.findIndex(function (m) { return String(m.id) === String(match.id); });
+    if (idx >= 0) {
+      matchesCache[idx] = match;
+    } else {
+      matchesCache.push(match);
+    }
+    matchesCache.sort(function (a, b) { return String(a.date).localeCompare(String(b.date)); });
+    saveLocalMatches(matchesCache);
+
+    setSyncStatus('syncing', 'Saving to Google Sheet…');
+
+    fetch(SHEET_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'save', match: match })
+    })
+      .then(function (res) { return res.json(); })
+      .then(function () {
+        setSyncStatus('ok', 'Synced with Google Sheet');
+        if (onDone) onDone(true);
+      })
+      .catch(function () {
+        setSyncStatus('err', 'Saved locally — will retry sync next time');
+        if (onDone) onDone(false);
+      });
+  }
+
+  function deleteMatchFromSheet(id, onDone) {
+    matchesCache = matchesCache.filter(function (m) { return String(m.id) !== String(id); });
+    saveLocalMatches(matchesCache);
+
+    setSyncStatus('syncing', 'Deleting from Google Sheet…');
+
+    fetch(SHEET_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'delete', id: id })
+    })
+      .then(function (res) { return res.json(); })
+      .then(function () {
+        setSyncStatus('ok', 'Synced with Google Sheet');
+        if (onDone) onDone(true);
+      })
+      .catch(function () {
+        setSyncStatus('err', 'Deleted locally — will retry sync next time');
+        if (onDone) onDone(false);
+      });
   }
 
   function showToast(message, error) {
@@ -1146,6 +1360,9 @@ document.addEventListener('DOMContentLoaded', function () {
       .replaceAll("'", '&#039;');
   }
 
+  // ════════════════════════════════════════════════════════════════
+  // MODE / NAV
+  // ════════════════════════════════════════════════════════════════
   function setMode(mode) {
     currentMode = mode;
 
@@ -1162,7 +1379,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function setLocation(type) {
     locationType = type;
-
     byId('homeBtn').classList.toggle('active', type === 'home');
     byId('awayBtn').classList.toggle('active', type === 'away');
   }
@@ -1183,6 +1399,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (page === 'history') renderHistory();
   }
 
+  // ════════════════════════════════════════════════════════════════
+  // STAT COUNTERS
+  // ════════════════════════════════════════════════════════════════
   function updateCount(stat) {
     const el = byId('cnt-' + stat);
     if (!el) return;
@@ -1203,7 +1422,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // ── Time on Pitch (stopwatch) ─────────────────────────────────────
+  // ════════════════════════════════════════════════════════════════
+  // TIME ON PITCH (stopwatch)
+  // ════════════════════════════════════════════════════════════════
   function formatTime(ms) {
     const totalSeconds = Math.floor(ms / 1000);
     const mins = Math.floor(totalSeconds / 60);
@@ -1268,7 +1489,36 @@ document.addEventListener('DOMContentLoaded', function () {
     updateTimeDisplay();
   }
 
-  // ── Cards / Sendings Off list ─────────────────────────────────────
+  function setTimeElapsed(ms) {
+    timeReset(true);
+    timeElapsedMs = ms || 0;
+    updateTimeDisplay();
+    byId('timeStatus').textContent = ms > 0 ? 'Loaded from saved match' : 'Not started';
+  }
+
+  // ════════════════════════════════════════════════════════════════
+  // WEATHER MULTI-SELECT
+  // ════════════════════════════════════════════════════════════════
+  function renderWeatherChips() {
+    document.querySelectorAll('.weather-chip').forEach(function (chip) {
+      const val = chip.dataset.weather;
+      chip.classList.toggle('active', selectedWeather.indexOf(val) !== -1);
+    });
+  }
+
+  function toggleWeather(val) {
+    const i = selectedWeather.indexOf(val);
+    if (i === -1) {
+      selectedWeather.push(val);
+    } else {
+      selectedWeather.splice(i, 1);
+    }
+    renderWeatherChips();
+  }
+
+  // ════════════════════════════════════════════════════════════════
+  // CARDS / SENDINGS OFF
+  // ════════════════════════════════════════════════════════════════
   function renderCardsList() {
     byId('cardsList').innerHTML = cardRows.map(function (row) {
       return '<div class="card-row" data-card-row="' + row.id + '">' +
@@ -1313,6 +1563,9 @@ document.addEventListener('DOMContentLoaded', function () {
     renderCardsList();
   }
 
+  // ════════════════════════════════════════════════════════════════
+  // RECORD / SAVE / RESET / EDIT
+  // ════════════════════════════════════════════════════════════════
   function resetRecord(skipConfirm) {
     if (!skipConfirm && !confirm('Clear all counts for new match?')) return;
 
@@ -1326,14 +1579,67 @@ document.addEventListener('DOMContentLoaded', function () {
     byId('scoreThem').value = 0;
     byId('matchDate').valueAsDate = new Date();
 
-    byId('weather').value = '';
     byId('motm').value = '';
     byId('mentions').value = '';
     byId('matchNotes').value = '';
+    selectedWeather = [];
+    renderWeatherChips();
     cardRows = [];
     renderCardsList();
 
     timeReset(true);
+
+    exitEditMode();
+  }
+
+  function exitEditMode() {
+    editingMatchId = null;
+    byId('editingBanner').style.display = 'none';
+    byId('cancelEditBtn').style.display = 'none';
+    byId('saveBtn').textContent = '💾 Save Match';
+  }
+
+  function enterEditMode(match) {
+    editingMatchId = match.id;
+
+    setMode(match.mode || 'club');
+    byId('opposition').value = match.opposition || '';
+    byId('scoreUs').value = match.scoreUs || 0;
+    byId('scoreThem').value = match.scoreThem || 0;
+
+    setLocation(match.location === 'away' ? 'away' : 'home');
+
+    if (match.date) {
+      byId('matchDate').value = match.date;
+    }
+
+    KEYS.forEach(function (key) {
+      counts[key] = (match.stats && match.stats[key]) || 0;
+      updateCount(key);
+    });
+
+    setTimeElapsed(match.timeOnPitchMs || 0);
+
+    const report = match.report || {};
+    byId('motm').value = report.motm || '';
+    byId('mentions').value = report.mentions || '';
+    byId('matchNotes').value = report.notes || '';
+
+    selectedWeather = Array.isArray(report.weather) ? report.weather.slice() : [];
+    renderWeatherChips();
+
+    cardRows = (report.cards || []).map(function (c) {
+      cardRowIdCounter++;
+      return { id: cardRowIdCounter, player: c.player || '', type: c.type || 'Yellow' };
+    });
+    renderCardsList();
+
+    byId('editingBanner').style.display = 'block';
+    byId('cancelEditBtn').style.display = 'block';
+    byId('saveBtn').textContent = '💾 Update Match';
+
+    showPage('record');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function saveMatch() {
@@ -1351,7 +1657,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const match = {
-      id: Date.now(),
+      id: editingMatchId || Date.now(),
       date: date,
       opposition: opposition,
       mode: currentMode,
@@ -1362,7 +1668,7 @@ document.addEventListener('DOMContentLoaded', function () {
       stats: Object.assign({}, counts),
       timeOnPitchMs: getCurrentElapsed(),
       report: {
-        weather: byId('weather').value,
+        weather: selectedWeather.slice(),
         motm: byId('motm').value.trim(),
         mentions: byId('mentions').value.trim(),
         notes: byId('matchNotes').value.trim(),
@@ -1372,37 +1678,45 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     };
 
-    const matches = getMatches();
-    matches.push(match);
+    const wasEditing = !!editingMatchId;
 
-    matches.sort(function (a, b) {
-      return a.date.localeCompare(b.date);
+    saveMatchToSheet(match, function (synced) {
+      showToast(wasEditing
+        ? (synced ? '✓ Match updated' : '✓ Updated (offline)')
+        : (synced ? '✓ Match saved' : '✓ Saved (offline)'));
     });
 
-    saveMatches(matches);
-    showToast('✓ Match saved');
     resetRecord(true);
   }
 
+  // ════════════════════════════════════════════════════════════════
+  // FILTERS
+  // ════════════════════════════════════════════════════════════════
   function getFilteredMatches(filter) {
     const matches = getMatches();
     if (filter === 'all') return matches;
-
-    return matches.filter(function (match) {
-      return match.mode === filter;
-    });
+    return matches.filter(function (match) { return match.mode === filter; });
   }
 
   function setDashFilter(filter) {
     dashFilter = filter;
-
     document.querySelectorAll('[data-dash-filter]').forEach(function (btn) {
       btn.className = 'filter-btn' + (btn.dataset.dashFilter === filter ? ' active-' + filter : '');
     });
-
     renderDashboard();
   }
 
+  function setHistFilter(filter) {
+    histFilter = filter;
+    document.querySelectorAll('[data-hist-filter]').forEach(function (btn) {
+      btn.className = 'filter-btn' + (btn.dataset.histFilter === filter ? ' active-' + filter : '');
+    });
+    renderHistory();
+  }
+
+  // ════════════════════════════════════════════════════════════════
+  // DASHBOARD
+  // ════════════════════════════════════════════════════════════════
   function renderDashboard() {
     const matches = getFilteredMatches(dashFilter);
     const totals = {};
@@ -1431,45 +1745,74 @@ document.addEventListener('DOMContentLoaded', function () {
     const selected = byId('statPicker').value;
     byId('chartTitle').textContent = LABELS[selected] + ' — Match by Match';
 
+    drawLineChart(matches, selected);
+  }
+
+  // Simple SVG line chart, point colour = club (gold) / school (blue)
+  function drawLineChart(matches, statKey) {
+    const svg = byId('lineChart');
+
     if (!matches.length) {
-      byId('barChart').innerHTML = '<div class="empty">No matches saved yet.</div>';
+      svg.innerHTML = '<text x="50%" y="50%" fill="#aaa79d" font-size="14" text-anchor="middle" dominant-baseline="middle">No matches saved yet.</text>';
+      svg.setAttribute('viewBox', '0 0 400 220');
       return;
     }
 
-    const maxValue = Math.max(
-      1,
-      ...matches.map(function (match) {
-        return (match.stats && match.stats[selected]) || 0;
-      })
-    );
+    const values = matches.map(function (m) { return (m.stats && m.stats[statKey]) || 0; });
+    const maxVal = Math.max(1, Math.max.apply(null, values));
 
-    byId('barChart').innerHTML = matches.map(function (match) {
-      const value = (match.stats && match.stats[selected]) || 0;
-      const width = Math.round((value / maxValue) * 100);
-      const date = new Date(match.date + 'T00:00:00').toLocaleDateString('en-GB', {
-        day:'numeric',
-        month:'short'
-      });
+    const W = Math.max(400, matches.length * 70);
+    const H = 220;
+    const padL = 36;
+    const padR = 16;
+    const padT = 20;
+    const padB = 36;
+    const chartW = W - padL - padR;
+    const chartH = H - padT - padB;
 
-      const colour = match.mode === 'club' ? '#f5c518' : '#3a8fd4';
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    svg.setAttribute('width', W);
 
-      return '<div class="bar-row">' +
-        '<div class="bar-label"><span>' + date + ' · ' + escapeHtml(match.team) + ' v ' + escapeHtml(match.opposition) + '</span><strong>' + value + '</strong></div>' +
-        '<div class="bar-track"><div class="bar-fill" style="width:' + width + '%; background:' + colour + ';"></div></div>' +
-        '</div>';
-    }).join('');
-  }
+    const stepX = matches.length > 1 ? chartW / (matches.length - 1) : 0;
 
-  function setHistFilter(filter) {
-    histFilter = filter;
+    function xFor(i) { return padL + (matches.length > 1 ? i * stepX : chartW / 2); }
+    function yFor(v) { return padT + chartH - (v / maxVal) * chartH; }
 
-    document.querySelectorAll('[data-hist-filter]').forEach(function (btn) {
-      btn.className = 'filter-btn' + (btn.dataset.histFilter === filter ? ' active-' + filter : '');
+    let svgHtml = '';
+
+    const gridSteps = 4;
+    for (let g = 0; g <= gridSteps; g++) {
+      const val = Math.round((maxVal / gridSteps) * g);
+      const y = yFor(val);
+      svgHtml += '<line x1="' + padL + '" y1="' + y + '" x2="' + (padL + chartW) + '" y2="' + y + '" stroke="#2f4f1f" stroke-width="1" />';
+      svgHtml += '<text x="' + (padL - 6) + '" y="' + (y + 4) + '" fill="#aaa79d" font-size="10" text-anchor="end">' + val + '</text>';
+    }
+
+    let pathD = '';
+    matches.forEach(function (m, i) {
+      const x = xFor(i);
+      const y = yFor((m.stats && m.stats[statKey]) || 0);
+      pathD += (i === 0 ? 'M' : 'L') + x + ' ' + y + ' ';
+    });
+    svgHtml += '<path d="' + pathD + '" fill="none" stroke="#76c43b" stroke-width="2.5" />';
+
+    matches.forEach(function (m, i) {
+      const x = xFor(i);
+      const y = yFor((m.stats && m.stats[statKey]) || 0);
+      const colour = (m.mode === 'school') ? '#3a8fd4' : '#f5c518';
+      const dateLabel = new Date(m.date + 'T00:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+
+      svgHtml += '<circle cx="' + x + '" cy="' + y + '" r="5" fill="' + colour + '" stroke="#071306" stroke-width="2" />';
+      svgHtml += '<text x="' + x + '" y="' + (H - 8) + '" fill="#aaa79d" font-size="10" text-anchor="middle">' + dateLabel + '</text>';
+      svgHtml += '<text x="' + x + '" y="' + (y - 10) + '" fill="#f2f0e9" font-size="11" font-weight="900" text-anchor="middle">' + ((m.stats && m.stats[statKey]) || 0) + '</text>';
     });
 
-    renderHistory();
+    svg.innerHTML = svgHtml;
   }
 
+  // ════════════════════════════════════════════════════════════════
+  // HISTORY
+  // ════════════════════════════════════════════════════════════════
   function renderHistory() {
     const matches = getFilteredMatches(histFilter).slice().reverse();
 
@@ -1498,8 +1841,8 @@ document.addEventListener('DOMContentLoaded', function () {
         reportHtml += '<div class="report-line"><strong>⏱️ Time on pitch:</strong> ' + formatTime(match.timeOnPitchMs) + '</div>';
       }
 
-      if (report.weather) {
-        reportHtml += '<div class="report-line"><strong>Weather:</strong> ' + escapeHtml(report.weather) + '</div>';
+      if (report.weather && report.weather.length) {
+        reportHtml += '<div class="report-line"><strong>Weather:</strong> ' + report.weather.map(escapeHtml).join(', ') + '</div>';
       }
 
       if (report.motm) {
@@ -1545,7 +1888,10 @@ document.addEventListener('DOMContentLoaded', function () {
             }).join('') +
           '</div>' +
           reportHtml +
-          '<button class="delete-btn" data-delete-match="' + match.id + '">Delete Match</button>' +
+          '<div class="match-actions">' +
+            '<button class="edit-btn" data-edit-match="' + match.id + '">✏️ Edit</button>' +
+            '<button class="delete-btn" data-delete-match="' + match.id + '">🗑 Delete</button>' +
+          '</div>' +
         '</div>' +
       '</div>';
     }).join('');
@@ -1554,15 +1900,25 @@ document.addEventListener('DOMContentLoaded', function () {
   function deleteMatch(id) {
     if (!confirm('Delete this match?')) return;
 
-    const matches = getMatches().filter(function (match) {
-      return String(match.id) !== String(id);
+    deleteMatchFromSheet(id, function (synced) {
+      showToast(synced ? '✓ Match deleted' : 'Deleted (offline)');
+      renderHistory();
+      renderDashboard();
     });
 
-    saveMatches(matches);
     renderHistory();
     renderDashboard();
   }
 
+  function editMatch(id) {
+    const match = getMatches().find(function (m) { return String(m.id) === String(id); });
+    if (!match) return;
+    enterEditMode(match);
+  }
+
+  // ════════════════════════════════════════════════════════════════
+  // EVENT WIRING
+  // ════════════════════════════════════════════════════════════════
   document.querySelectorAll('[data-mode]').forEach(function (btn) {
     btn.addEventListener('click', function () {
       setMode(btn.dataset.mode);
@@ -1607,17 +1963,44 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
+  document.querySelectorAll('.weather-chip').forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      toggleWeather(chip.dataset.weather);
+    });
+  });
+
   byId('saveBtn').addEventListener('click', saveMatch);
   byId('resetBtn').addEventListener('click', function () {
     resetRecord(false);
   });
+  byId('cancelEditBtn').addEventListener('click', function () {
+    if (confirm('Discard changes and stop editing?')) {
+      resetRecord(true);
+    }
+  });
   byId('statPicker').addEventListener('change', renderDashboard);
+
+  byId('timeStartBtn').addEventListener('click', timeStart);
+  byId('timePauseBtn').addEventListener('click', timePause);
+  byId('timeResetBtn').addEventListener('click', function () {
+    timeReset(false);
+  });
+
+  byId('addCardBtn').addEventListener('click', addCardRow);
 
   document.addEventListener('click', function (event) {
     const openTarget = event.target.closest('[data-open-match]');
     if (openTarget) {
       const body = byId('match-body-' + openTarget.dataset.openMatch);
       if (body) body.classList.toggle('open');
+      return;
+    }
+
+    const editTarget = event.target.closest('[data-edit-match]');
+    if (editTarget) {
+      event.preventDefault();
+      event.stopPropagation();
+      editMatch(editTarget.dataset.editMatch);
       return;
     }
 
@@ -1629,19 +2012,22 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  byId('timeStartBtn').addEventListener('click', timeStart);
-  byId('timePauseBtn').addEventListener('click', timePause);
-  byId('timeResetBtn').addEventListener('click', function () {
-    timeReset(false);
-  });
-
-  byId('addCardBtn').addEventListener('click', addCardRow);
-
+  // ════════════════════════════════════════════════════════════════
+  // INIT
+  // ════════════════════════════════════════════════════════════════
   byId('matchDate').valueAsDate = new Date();
   setMode('club');
   setLocation('home');
   renderCardsList();
+  renderWeatherChips();
   updateTimeDisplay();
+
+  matchesCache = loadLocalMatches();
+
+  refreshFromSheet(function () {
+    if (document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
+    if (document.getElementById('page-history').classList.contains('active')) renderHistory();
+  });
 });
 </script>
 
